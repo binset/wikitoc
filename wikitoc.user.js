@@ -2,7 +2,8 @@
 // @name        Wikipedia TOC Enhanced
 // @author      teamrc
 // @namespace   https://github.com/teamrc/wikitoc
-// @license     Creative Commons Attribution License
+// @homepage    http://teamrc.github.io/wikitoc/
+// @license     GNU GPL version 3.0
 // @description Table of Contents Enhancer for Wikipedia
 // @require     http://code.jquery.com/jquery-1.3.2.min.js
 // @include     *wikipedia.org/*

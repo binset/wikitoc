@@ -22,3 +22,12 @@ Usage instructions:
 * you can click on >> to resize the TOC panel 30 pixels to the right
 * you can click on toggle_toc to move the TOC between the left hand panel or the main content area
 
+
+License:
+* wikitoc is released under GNU GPL 3.0
+
+Author(s):
+* teamrc, 2013
+
+Project Home Page:
+* http://teamrc.github.io/wikitoc
