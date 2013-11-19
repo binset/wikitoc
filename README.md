@@ -6,6 +6,11 @@ Enhanced Wikipedia Table of Contents:
 * It moves the TOC to the left hand side panel, and highlights the current section that the reader is on.
 * It also retains the ability for the user to jump to different sections on the TOC by clicking on the links.
 
+
+Screenshot:
+* https://raw.github.com/teamrc/wikitoc/master/screenshot.png
+
+
 Installation instructions:
 * Ensure you have Firefox installed. https://www.mozilla.org/en-US/firefox/new/
 * Ensure you install the Greasemonkey extension for Firefox. https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/
@@ -14,6 +19,7 @@ Installation instructions:
 * If you have Greasemonkey installed, Greasemonkey will prompt you to install the wikitoc script.
 * Click install to continue
 * Installation complete
+
 	
 Usage instructions:
 * Load a wikipedia.org related page, e.g. http://en.wikipedia.org/wiki/Firefox
@@ -26,8 +32,10 @@ Usage instructions:
 License:
 * wikitoc is released under GNU GPL 3.0
 
+
 Author(s):
 * teamrc, 2013
+
 
 Project Home Page:
 * http://teamrc.github.io/wikitoc
