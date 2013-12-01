@@ -317,32 +317,45 @@ var wiki_toc=
 
     init_html_buttons:function(o)
     {
-            /** add html control buttons to TOC
+        /** add html control buttons to TOC
         */
         
-        //find <div id="toctitle"
+        // find <div id="toctitle"
+        // then create the buttons
+        // then add the created buttons to the HTML page.
+        
+        
         var toctitle = document.getElementById('toctitle');
         
-        //and add html buttons
+        //Main toc toggle button
         var toctoggle = document.createElement('a');
         toctoggle.setAttribute("id", "toctoggle");
         toctoggle.setAttribute("title", "Click here to toggle TOC between Left Hand or Right Hand panel");
-        toctoggle.innerHTML = "toggle_toc";
-        toctitle.appendChild(toctoggle);
+        var toctoggle_img = document.createElement('img');
+        toctoggle_img.setAttribute("width", "13");
+        toctoggle_img.setAttribute("height", "13");
+        toctoggle_img.setAttribute("srcset", "13");
+        toctoggle_img.setAttribute("src", "http://openiconlibrary.sourceforge.net/gallery2/open_icon_library-full/icons/png/64x64/actions/draw-text-2.png");
+        toctoggle_img.setAttribute("alt", "toggle_toc");
+        toctoggle.appendChild(toctoggle_img);
         
+        //left resize button
         var tocresizeleft = document.createElement('a');
         tocresizeleft.setAttribute("id", "tocresizeleft");
         tocresizeleft.setAttribute("title", "Reduce size of TOC");
         tocresizeleft.innerHTML = "<<";
-        toctitle.appendChild(tocresizeleft);
         
+        //right resize button
         var tocresizeright = document.createElement('a');
         tocresizeright.setAttribute("id", "tocresizeright");
         tocresizeright.setAttribute("title", "Increase size of TOC");
         tocresizeright.innerHTML = ">>";
+        
+        
+        //Now add all the created elements into the HTML document
+        toctitle.appendChild(tocresizeleft);
+        toctitle.appendChild(toctoggle);
         toctitle.appendChild(tocresizeright);
-        
-        
     },
     
     init_toc_chapter_listing:function(o)
