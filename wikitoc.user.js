@@ -413,8 +413,9 @@ var wiki_toc=
         
         util.debug("toc_toggle_left() toc_height:" + toc_height + " toc_width:" + toc_width);
      
-        $("#toc").css({"z-index": "9999", height: toc_height, width: toc_width, overflow: 'auto', border: '1px solid black', position: 'fixed', left:'2px', top: '0px' });
+        //$("#toc").css({"z-index": "9999", height: toc_height, width: toc_width, overflow: 'auto', border: '1px solid black', position: 'fixed', left:'2px', top: '0px' });
         $("#toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'fixed', left:'2px', top: '0px' });
+        $("#toc").css("display", "block");
         
         //var css_link = document.createElement("link");
         //css_link.setAttribute("rel", "stylesheet");
