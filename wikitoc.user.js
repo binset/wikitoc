@@ -326,16 +326,19 @@ var wiki_toc=
         //and add html buttons
         var toctoggle = document.createElement('a');
         toctoggle.setAttribute("id", "toctoggle");
+        toctoggle.setAttribute("title", "Click here to toggle TOC between Left Hand or Right Hand panel");
         toctoggle.innerHTML = "toggle_toc";
         toctitle.appendChild(toctoggle);
         
         var tocresizeleft = document.createElement('a');
         tocresizeleft.setAttribute("id", "tocresizeleft");
+        tocresizeleft.setAttribute("title", "Reduce size of TOC");
         tocresizeleft.innerHTML = "<<";
         toctitle.appendChild(tocresizeleft);
         
         var tocresizeright = document.createElement('a');
         tocresizeright.setAttribute("id", "tocresizeright");
+        tocresizeright.setAttribute("title", "Increase size of TOC");
         tocresizeright.innerHTML = ">>";
         toctitle.appendChild(tocresizeright);
         
@@ -472,27 +475,30 @@ var wiki_toc=
         var pixels_to_move = 30;
         var margin_left;
         
-        margin_left = parseInt($("#left-navigation").css('margin-left'));
-        margin_left -= pixels_to_move;
-        
-        if (margin_left  > 10)  //hardcoded
-        {		
+        if (db.get_wikitoc_on_lhs())
+        {
             margin_left = parseInt($("#left-navigation").css('margin-left'));
             margin_left -= pixels_to_move;
-            margin_left += "px";
-            $("#left-navigation").css('margin-left', margin_left);
             
-            margin_left = parseInt($("#content").css('margin-left'));
-            margin_left -= pixels_to_move;
-            margin_left += "px";
-            $("#content").css('margin-left',  margin_left);
-            
-            var toc_width = parseInt($("#toc").css('width'));
-            toc_width -= pixels_to_move;
-            toc_width += "px";
-            $("#toc").css('width',  toc_width);
-            db.set_wikitoc_margin_position(toc_width); 
-            
+            if (margin_left  > 10)  //hardcoded
+            {		
+                margin_left = parseInt($("#left-navigation").css('margin-left'));
+                margin_left -= pixels_to_move;
+                margin_left += "px";
+                $("#left-navigation").css('margin-left', margin_left);
+                
+                margin_left = parseInt($("#content").css('margin-left'));
+                margin_left -= pixels_to_move;
+                margin_left += "px";
+                $("#content").css('margin-left',  margin_left);
+                
+                var toc_width = parseInt($("#toc").css('width'));
+                toc_width -= pixels_to_move;
+                toc_width += "px";
+                $("#toc").css('width',  toc_width);
+                db.set_wikitoc_margin_position(toc_width); 
+                
+            }
         }
     },
     
@@ -501,21 +507,24 @@ var wiki_toc=
         var pixels_to_move = 30;
         var margin_left;
         
-        margin_left = parseInt($("#left-navigation").css('margin-left'));
-        margin_left += pixels_to_move;
-        margin_left += "px";
-        $("#left-navigation").css('margin-left', margin_left);
-        
-        margin_left = parseInt($("#content").css('margin-left'));
-        margin_left += pixels_to_move;
-        margin_left += "px";
-        $("#content").css('margin-left',  margin_left);
-        
-        var toc_width = parseInt($("#toc").css('width'));
-        toc_width += pixels_to_move;
-        toc_width += "px";
-        $("#toc").css('width',  toc_width);
-        db.set_wikitoc_margin_position(toc_width); 
+        if (db.get_wikitoc_on_lhs())
+        {
+            margin_left = parseInt($("#left-navigation").css('margin-left'));
+            margin_left += pixels_to_move;
+            margin_left += "px";
+            $("#left-navigation").css('margin-left', margin_left);
+            
+            margin_left = parseInt($("#content").css('margin-left'));
+            margin_left += pixels_to_move;
+            margin_left += "px";
+            $("#content").css('margin-left',  margin_left);
+            
+            var toc_width = parseInt($("#toc").css('width'));
+            toc_width += pixels_to_move;
+            toc_width += "px";
+            $("#toc").css('width',  toc_width);
+            db.set_wikitoc_margin_position(toc_width); 
+        }
         
     },
     
@@ -528,7 +537,8 @@ var wiki_toc=
         var nu = 0;
         for (nu=0,i=0; i<o.chapters_listing.length; i++){
             o.chapters_listing[i][1].className=o.chapters_listing[i][2];
-            (this.pos(o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/2)<0?nu=i:null;
+            //(this.pos(o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/2)<0?nu=i:null;
+            (this.pos(o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/100)<0?nu=i:null;
             
         }
         if (nu !== null) {
