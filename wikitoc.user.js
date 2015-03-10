@@ -1,4 +1,4 @@
-// ==UserScript==
+﻿// ==UserScript==
 // @name        Wikipedia TOC Enhanced
 // @author      teamrc
 // @namespace   https://github.com/teamrc/wikitoc
@@ -247,17 +247,18 @@ var wiki_toc=
         
         if (db.get_wikitoc_status() == true) 
         {
+            html_code = '<link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">';
+            $('head').append(html_code);
+            html_code = '<script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>';
+            $('head').append(html_code);
+            
             util.debug("Initialising wiki_toc()...1");
-            this.init_html_buttons(o);
-            util.debug("Initialising wiki_toc()...2");
             this.init_save_positions(o);
-            util.debug("Initialising wiki_toc()...3");
+            util.debug("Initialising wiki_toc()...2");
             this.init_toc_chapter_listing(o);
-            util.debug("Initialising wiki_toc()...4");
-            this.init_events(o);
-            util.debug("Initialising wiki_toc()...5");
+            util.debug("Initialising wiki_toc()...3");
             //this.init_saved_values(o);
-            util.debug("Initialising wiki_toc()...6");
+            util.debug("Initialising wiki_toc()...4");
             
             if (db.get_wikitoc_on_lhs() == null)
             {
@@ -269,6 +270,10 @@ var wiki_toc=
             {
                 this.toc_toggle_left(o);
             }
+            util.debug("Initialising wiki_toc()...5");
+            this.init_html_buttons(o);
+            util.debug("Initialising wiki_toc()...6");
+            this.init_events(o);
             util.debug("DEBUG:Done with initialising wiki_toc");
         } else {
             util.debug("DEBUG:wiki_toc is not running");
@@ -284,7 +289,6 @@ var wiki_toc=
         this.addevt(window,'scroll','scroll',o);
         this.scroll(o);
         
-        util.debug("DEBUG:3");
         var toctoggle = document.getElementById("toctoggle");
         this.addevt(toctoggle,'click','toc_toggle',o);
         
@@ -293,6 +297,9 @@ var wiki_toc=
         
         var tocresizeright = document.getElementById("tocresizeright");
         this.addevt(tocresizeright,'click','frame_move_right',o);
+
+        this.addevt(window,'scroll','toc_scroll_lock',o);
+
     },
     
     init_save_positions:function(o)
@@ -424,22 +431,39 @@ var wiki_toc=
         var toc_width = db.get_wikitoc_margin_position(); 
         if (toc_width == null)
         {
-            toc_width = $("#toc").css('width');
+            //toc_width = $("#toc").css('width');
+            toc_width = $("#p-namespaces")[0].getBoundingClientRect().left ;
         }
         
         util.debug("toc_toggle_left() toc_height:" + toc_height + " toc_width:" + toc_width);
      
-        //$("#toc").css({"z-index": "9999", height: toc_height, width: toc_width, overflow: 'auto', border: '1px solid black', position: 'fixed', left:'2px', top: '0px' });
-        $("#toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'fixed', left:'2px', top: '0px' });
-        $("#toc").css("display", "block");
-        
+        //$("#lhs_toc").css({"z-index": "9999", height: toc_height, width: toc_width, overflow: 'auto', border: '1px solid black', position: 'fixed', left:'2px', top: '0px' });
+        var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
+        var lhs_panel_yposition = $("#p-lang").position()['top'];
+        var lhs_panel_height = $("#p-lang").height();
+        lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
+        lhs_toc_position += "px";
+
+
+        //$("#toc").clone().attr('id', 'lhs_toc').insertAfter("#mw-panel");
+        util.debug('zzz' + $("#toc"));
+        var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
+        cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
+        cloned_toc.insertAfter("#p-lang");
+        $("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
+        $("#lhs_toc").css("display", "block");
+        $("#lhs_toc").css("padding-left", "0px");
+        $("#lhs_toc").css("padding-right", "0px");
+
         //var css_link = document.createElement("link");
         //css_link.setAttribute("rel", "stylesheet");
         //css_link.setAttribute("href", "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css");
         //document.head.appendChild(css_link);
-        
-        //$("#toc").attr("class", "toc ui-widget-content ui-resizable");
-        //$('#toc').resizable("enable")
+
+        //$("#lhs_toc").attr("class", "toc ui-widget-content ui-resizable");
+        //$('#lhs_toc').resizable()
+        //$("#lhs_toc").resizable("enable");
+        //$("#lhs_toc").resizable( "option", "handles", "e" );
         
         
         db.set_wikitoc_on_lhs(true);
@@ -470,8 +494,9 @@ var wiki_toc=
         uses original toc values from o.toc_original dictionary.
         */
         
-        $("#toc").css({"z-index": "9999", height: o.toc_original["height"], width: o.toc_original["width"], overflow: o.toc_original["overflow"],
+        $("#lhs_toc").css({"z-index": "9999", height: o.toc_original["height"], width: o.toc_original["width"], overflow: o.toc_original["overflow"],
                        border: o.toc_original["border"], position: o.toc_original["position"], left:o.toc_original["left"], top: o.toc_original["top"] });
+        $("#lhs_toc").remove();
         this.frame_restore(o);
         
         db.set_wikitoc_on_lhs(false);
@@ -505,10 +530,10 @@ var wiki_toc=
                 margin_left += "px";
                 $("#content").css('margin-left',  margin_left);
                 
-                var toc_width = parseInt($("#toc").css('width'));
+                var toc_width = parseInt($("#lhs_toc").css('width'));
                 toc_width -= pixels_to_move;
                 toc_width += "px";
-                $("#toc").css('width',  toc_width);
+                $("#lhs_toc").css('width',  toc_width);
                 db.set_wikitoc_margin_position(toc_width); 
                 
             }
@@ -532,13 +557,38 @@ var wiki_toc=
             margin_left += "px";
             $("#content").css('margin-left',  margin_left);
             
-            var toc_width = parseInt($("#toc").css('width'));
+            var toc_width = parseInt($("#lhs_toc").css('width'));
             toc_width += pixels_to_move;
             toc_width += "px";
-            $("#toc").css('width',  toc_width);
+            $("#lhs_toc").css('width',  toc_width);
             db.set_wikitoc_margin_position(toc_width); 
         }
         
+    },
+
+    toc_scroll_lock:function(o)
+    {
+        //lock position of lhs toc if user scrolls below the lhs panel
+
+
+          var lhs_panel_yposition = $("#p-lang").position()['top'];
+          var lhs_panel_height = $("#p-lang").height();
+          var lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
+
+          var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
+          var lhs_toc_scroll_lock = util.pixels_addition(lhs_toc_position, lhs_mwpanel_yposition);
+
+          util.debug('scrolltop:' + document.documentElement.scrollTop);
+          util.debug('toc position:' + lhs_toc_position);
+
+          var curr_scrolltop = (document.documentElement || document.body.parentNode || document.body).scrollTop;
+          if (curr_scrolltop > lhs_toc_scroll_lock) {
+            $("#lhs_toc").css("top", 0);
+            $("#lhs_toc").css("position", "fixed");
+          } else {
+            $("#lhs_toc").css("top", lhs_toc_position);
+            $("#lhs_toc").css("position", "absolute");
+          }
     },
     
     scroll:function(o)
@@ -568,8 +618,7 @@ var wiki_toc=
         /**given the name of the current_section, update the toc (table of contents) to highlight this section, and also unhighlight any other highlighted sections
         */
         
-        var toc_table = document.getElementById("toc");
-        var toc_table_ul = toc_table.lastElementChild;
+        var toc_table_ul = document.getElementById("lhs_toc").lastElementChild;
         
         //Given the <ul> of the TOC, find each <a href> and look for current_section
         var anchor_links = toc_table_ul.getElementsByTagName("a");
