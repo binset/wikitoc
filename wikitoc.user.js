@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name        Wikipedia TOC Enhanced
 // @author      teamrc
 // @namespace   https://github.com/teamrc/wikitoc
@@ -7,6 +7,11 @@
 // @description Table of Contents Enhancer for Wikipedia
 // @require     http://code.jquery.com/jquery-1.3.2.min.js
 // @include     *wikipedia.org/*
+// @require  http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
+// @require  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js
+// @resource jqUI_CSS  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css
+// @grant    GM_addStyle
+// @grant    GM_getResourceText
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @version     1
@@ -465,6 +470,33 @@ var wiki_toc=
         //$("#lhs_toc").resizable("enable");
         //$("#lhs_toc").resizable( "option", "handles", "e" );
         
+        $('#lhs_toc').resizable(
+        {
+ 			handles: "e",
+ 			stop: function(e, ui) {
+	 			var pixels_moved = Math.abs(ui.size.width-ui.originalSize.width);
+            	util.debug('resizing stopped');
+            	util.debug("original width" + ui.originalSize.width);
+            	util.debug("new      width" + ui.size.width);
+				util.debug(ui.size.width-ui.originalSize.width);
+                util.debug('goingtomove?');	
+                util.debug('this?' + this);
+                //util.debug('this.frame_move_right?' + this.frame_move_right);
+                
+            	if (ui.size.width > ui.originalSize.width) {
+            		//lhs_toc moved right
+            		util.debug('goingtomoveright?');
+            		//o.frame_move_right(o, pixels_moved);
+            		util.debug('goingtomoveright!');
+             	} else {
+	            	//lhs_toc moved left
+	            	//o.frame_move_left(o, pixels_moved);
+            	}
+            	util.debug('goingtomove?');
+        	},
+ 		}
+ 		);
+ 		util.debug("\t\tresize!");
         
         db.set_wikitoc_on_lhs(true);
         
@@ -704,10 +736,15 @@ var wiki_toc=
     
 };
 
-util.debug("calling wiki_toc.init({})");
-wiki_toc.init({});
 
-util.debug("wiki_toc.init({}) exit");
+$(document).ready(function() {
+	var jqUI_CssSrc = GM_getResourceText ("jqUI_CSS");
+	GM_addStyle (jqUI_CssSrc);
+	util.debug("calling wiki_toc.init({})");
+	wiki_toc.init({});
+	util.debug("wiki_toc.init({}) exit");
+});
+
 
 /*
 function deserialize(name, def) {
