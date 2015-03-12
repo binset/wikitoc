@@ -246,7 +246,7 @@ var wiki_toc=
         // then save frame CSS settings
         // then add buttons to TOC
         // then run toc_toggle_left()
-        // then adds the scroll event
+        // then adds the page_scroll event
         
         db.set_wikitoc_status(true);
         
@@ -291,8 +291,8 @@ var wiki_toc=
     
     init_events:function(o)
     {
-        this.addevt(window,'scroll','scroll',o);
-        this.scroll(o);
+        this.addevt(window,'scroll','page_scroll',o);
+        this.page_scroll(o);
         
         var toctoggle = document.getElementById("toctoggle");
         this.addevt(toctoggle,'click','toc_toggle',o);
@@ -623,7 +623,7 @@ var wiki_toc=
           }
     },
     
-    scroll:function(o)
+    page_scroll:function(o)
     {
         /** event that gets called when user scrolls.
             Hightlights current chapter in the TOC
@@ -650,7 +650,7 @@ var wiki_toc=
         /**given the name of the current_section, update the toc (table of contents) to highlight this section, and also unhighlight any other highlighted sections
         */
         
-        var toc_table_ul = document.getElementById("lhs_toc").lastElementChild;
+        var toc_table_ul = document.getElementById("lhs_toc");
         
         //Given the <ul> of the TOC, find each <a href> and look for current_section
         var anchor_links = toc_table_ul.getElementsByTagName("a");
@@ -746,12 +746,3 @@ $(document).ready(function() {
 });
 
 
-/*
-function deserialize(name, def) {
-  return eval(GM_getValue(name, (def || '({})')));
-}
-
-function serialize(name, val) {
-  GM_setValue(name, uneval(val));
-}
-*/
