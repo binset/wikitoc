@@ -26,9 +26,6 @@
 */
 
 
-console.log("wikitoc script start");
-
-
 var db = 
 {
     /** 
@@ -186,11 +183,9 @@ var db =
 
 var util = 
 {
-    
     debug:function(debug_string)
     {
         var debugging = true;
-        
         if (debugging)
         {
             console.log("DEBUG " + window.location.host + ": " + debug_string);
@@ -226,19 +221,10 @@ var util =
         
         return pixels_a - pixels_b;
     },
-    
-    
 };
-
-util.debug("wiki_toc init()");
-
-
-
 
 var wiki_toc=
 {
-    varname: "macintosh",
-    
     init:function(o)
     {
         // process TOC chapter listing
@@ -662,16 +648,17 @@ var wiki_toc=
                 section_tmp = section_tmp.substring(1); //strip away leading # from a href
                 if (section_tmp == current_section)
                 {
-                    //Found the right section, now <bold> the text of this section
+                    //Found the right section, now <highlight> the text of this section
                     
-                    var new_element = document.createElement("B");
+                    var new_element = document.createElement("SPAN");
                     new_element.textContent = anchor_links[index].lastChild.textContent;
+                    new_element.setAttribute('style','background-color: #FFFF00');
                     anchor_links[index].lastChild.textContent = "";
                     anchor_links[index].lastChild.appendChild(new_element);
                     
                 } else 
                 {
-                    //Not the  right section, remove any <bold> this section
+                    //Not the  right section, remove any <underline> of this section
                     
                     var section_name = anchor_links[index].lastChild.lastChild.textContent;
                     anchor_links[index].lastChild.removeChild(anchor_links[index].lastChild.lastChild);
@@ -733,16 +720,13 @@ var wiki_toc=
         }
         return rtn;
     }
-    
 };
 
 
 $(document).ready(function() {
 	var jqUI_CssSrc = GM_getResourceText ("jqUI_CSS");
 	GM_addStyle (jqUI_CssSrc);
-	util.debug("calling wiki_toc.init({})");
+	util.debug("wiki_toc.init({}) start");
 	wiki_toc.init({});
 	util.debug("wiki_toc.init({}) exit");
 });
-
-
