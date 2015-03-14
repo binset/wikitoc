@@ -7,11 +7,11 @@
 // @description Table of Contents Enhancer for Wikipedia
 // @require     http://code.jquery.com/jquery-1.3.2.min.js
 // @include     *wiki*
-// @require  http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
-// @require  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js
-// @resource jqUI_CSS  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css
-// @grant    GM_addStyle
-// @grant    GM_getResourceText
+// @require     http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
+// @require     http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js
+// @resource    jqUI_CSS  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css
+// @grant       GM_addStyle
+// @grant       GM_getResourceText
 // @grant       GM_getValue
 // @grant       GM_setValue
 // @version     1
@@ -238,11 +238,6 @@ var wiki_toc=
         
         if (db.get_wikitoc_status() == true) 
         {
-            html_code = '<link rel="stylesheet" href="//code.jquery.com/ui/1.11.3/themes/smoothness/jquery-ui.css">';
-            $('head').append(html_code);
-            html_code = '<script src="//code.jquery.com/ui/1.11.3/jquery-ui.js"></script>';
-            $('head').append(html_code);
-            
             util.debug("Initialising wiki_toc()...1");
             this.init_save_positions(o);
             util.debug("Initialising wiki_toc()...2");
@@ -272,9 +267,6 @@ var wiki_toc=
         
     },
     
-    
-    
-    
     init_events:function(o)
     {
         this.addevt(window,'scroll','page_scroll',o);
@@ -283,14 +275,7 @@ var wiki_toc=
         var toctoggle = document.getElementById("toctoggle");
         this.addevt(toctoggle,'click','toc_toggle',o);
         
-        var tocresizeleft = document.getElementById("tocresizeleft");
-        this.addevt(tocresizeleft,'click','frame_move_left',o);
-        
-        var tocresizeright = document.getElementById("tocresizeright");
-        this.addevt(tocresizeright,'click','frame_move_right',o);
-
         this.addevt(window,'scroll','toc_scroll_lock',o);
-
     },
     
     init_save_positions:function(o)
@@ -308,10 +293,7 @@ var wiki_toc=
         //save LHS frame settings
         o.frame_left_navigation = $("#left-navigation").css('margin-left');
         o.frame_content = $("#content").css('margin-left');
-        
-        
     },
-    
 
     init_html_buttons:function(o)
     {
@@ -337,23 +319,8 @@ var wiki_toc=
         toctoggle_img.setAttribute("alt", "toggle_toc");
         toctoggle.appendChild(toctoggle_img);
         
-        //left resize button
-        var tocresizeleft = document.createElement('a');
-        tocresizeleft.setAttribute("id", "tocresizeleft");
-        tocresizeleft.setAttribute("title", "Reduce size of TOC");
-        tocresizeleft.innerHTML = "<<";
-        
-        //right resize button
-        var tocresizeright = document.createElement('a');
-        tocresizeright.setAttribute("id", "tocresizeright");
-        tocresizeright.setAttribute("title", "Increase size of TOC");
-        tocresizeright.innerHTML = ">>";
-        
-        
         //Now add all the created elements into the HTML document
-        toctitle.appendChild(tocresizeleft);
         toctitle.appendChild(toctoggle);
-        toctitle.appendChild(tocresizeright);
     },
     
     init_toc_chapter_listing:function(o)
@@ -466,37 +433,15 @@ var wiki_toc=
               util.debug("new      width" + ui.size.width);
               util.debug("going to move:" + (ui.size.width-ui.originalSize.width));
 
-              if (ui.size.width > ui.originalSize.width) {
-                //lhs_toc moved right
-                util.debug("goingtomoveframeright:" + pixels_moved);
-                that.frame_move_right(pixels_moved);
-              } else {
-                //lhs_toc moved left
-                util.debug("goingtomoveframeleft:" + pixels_moved);
-                that.frame_move_left(pixels_moved);
-              }
-              util.debug('goingtomove?');
+              that.update_content_margin();
             },
         });
         util.debug("\t\tresize!");
         db.set_wikitoc_on_lhs(true);
         
         //resize the main content section on RHS on fit the size of the TOC on LHS
-        util.debug("\t\tTOC margin" + toc_width);
-        util.debug("\t\tleft-nav left margin:" + $("#left-navigation").css('margin-left'));
-        util.debug("\t\tcontent left margin:" + $("#content").css('margin-left'));
-        //$("#left-navigation").css('margin-left', toc_width);
-        //$("#content").css('margin-left', toc_width);
-        
-        toc_width = util.pixels_to_int(toc_width); //strip away "px", convert to int
-        var margin_left = util.pixels_to_int($("#left-navigation").css('margin-left'));
-        if (toc_width > margin_left)
-        {
-            $("#left-navigation").css('margin-left', toc_width);
-            $("#content").css('margin-left',  toc_width);
-        }
+        this.update_content_margin();
     },
-    
     
     toc_toggle_right:function(o)
     {
@@ -518,57 +463,18 @@ var wiki_toc=
         $("#content").css('margin-left',  o.frame_content);
     },
     
-    frame_move_left:function(pixels_to_move)
+    update_content_margin:function()
     {
+        //based on the width of lhs_toc, update the position of the main CONTENTS margin to follow that of the lhs_toc
         var margin_left;
         
         if (db.get_wikitoc_on_lhs())
         {
-            margin_left = parseInt($("#left-navigation").css('margin-left'));
-            margin_left -= pixels_to_move;
-            
-            if (margin_left  > 80)  //hardcoded
-            {
-                margin_left = parseInt($("#left-navigation").css('margin-left'));
-                margin_left -= pixels_to_move;
-                margin_left += "px";
-                $("#left-navigation").css('margin-left', margin_left);
-                
-                margin_left = parseInt($("#content").css('margin-left'));
-                margin_left -= pixels_to_move;
-                margin_left += "px";
-                $("#content").css('margin-left',  margin_left);
-                
-                var toc_width = parseInt($("#lhs_toc").css('width'));
-                db.set_wikitoc_margin_position(toc_width); 
-            } else 
-            {
-                //user is trying to resize the lhs_toc to too small a size, undo what he did
-                var original_margin = parseInt($("#left-navigation").css('margin-left'));
-                $("#lhs_toc").css('width',  original_margin);
-            }
+            var lhs_toc_width = parseInt($("#lhs_toc").css('width'));
+            $("#left-navigation").css('margin-left', lhs_toc_width);
+            $("#content").css('margin-left', lhs_toc_width  );
+            db.set_wikitoc_margin_position(lhs_toc_width); 
         }
-    },
-    
-    frame_move_right:function(pixels_to_move)
-    {
-        var margin_left;
-        if (db.get_wikitoc_on_lhs())
-        {
-            margin_left = parseInt($("#left-navigation").css('margin-left'));
-            margin_left += pixels_to_move;
-            margin_left += "px";
-            $("#left-navigation").css('margin-left', margin_left);
-            
-            margin_left = parseInt($("#content").css('margin-left'));
-            margin_left += pixels_to_move;
-            margin_left += "px";
-            $("#content").css('margin-left',  margin_left);
-            
-            var toc_width = parseInt($("#lhs_toc").css('width'));
-            db.set_wikitoc_margin_position(toc_width); 
-        }
-        
     },
 
     toc_scroll_lock:function(o)
@@ -691,7 +597,7 @@ var wiki_toc=
             o.attachEvent('on'+event_name,function(e){ return oop[function_name](p,e); });
             //util.debug("adding attach event :" + event_name + " function_name:" + function_name + " p:" + p);
         }
-            },
+    },
     
     pos:function(obj)
     {
