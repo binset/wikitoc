@@ -6,7 +6,7 @@
 // @license     GNU GPL version 3.0
 // @description Table of Contents Enhancer for Wikipedia
 // @require     http://code.jquery.com/jquery-1.3.2.min.js
-// @include     *wikipedia.org/*
+// @include     *wiki*
 // @require  http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @require  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js
 // @resource jqUI_CSS  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css
@@ -456,38 +456,30 @@ var wiki_toc=
         //$("#lhs_toc").resizable("enable");
         //$("#lhs_toc").resizable( "option", "handles", "e" );
         
-        $('#lhs_toc').resizable(
-        {
- 			handles: "e",
- 			stop: function(e, ui) {
-	 			var pixels_moved = Math.abs(ui.size.width-ui.originalSize.width);
-            	util.debug('resizing stopped');
-            	util.debug("original width" + ui.originalSize.width);
-            	util.debug("new      width" + ui.size.width);
-				util.debug(ui.size.width-ui.originalSize.width);
-                util.debug('goingtomove?');	
-                util.debug('this?' + this);
-                //util.debug('this.frame_move_right?' + this.frame_move_right);
-                
-            	if (ui.size.width > ui.originalSize.width) {
-            		//lhs_toc moved right
-            		util.debug('goingtomoveright?');
-            		//o.frame_move_right(o, pixels_moved);
-            		util.debug('goingtomoveright!');
-             	} else {
-	            	//lhs_toc moved left
-	            	//o.frame_move_left(o, pixels_moved);
-            	}
-            	util.debug('goingtomove?');
-        	},
- 		}
- 		);
- 		util.debug("\t\tresize!");
-        
+        var that = this;
+        util.debug('resizing starting');
+        $('#lhs_toc').resizable({
+          handles: "e",
+          stop: function(e, ui){
+              var pixels_moved = Math.abs(ui.size.width - ui.originalSize.width);
+              util.debug("original width" + ui.originalSize.width);
+              util.debug("new      width" + ui.size.width);
+              util.debug("going to move:" + (ui.size.width-ui.originalSize.width));
+
+              if (ui.size.width > ui.originalSize.width) {
+                //lhs_toc moved right
+                util.debug("goingtomoveframeright:" + pixels_moved);
+                that.frame_move_right(pixels_moved);
+              } else {
+                //lhs_toc moved left
+                util.debug("goingtomoveframeleft:" + pixels_moved);
+                that.frame_move_left(pixels_moved);
+              }
+              util.debug('goingtomove?');
+            },
+        });
+        util.debug("\t\tresize!");
         db.set_wikitoc_on_lhs(true);
-        
-        
-        
         
         //resize the main content section on RHS on fit the size of the TOC on LHS
         util.debug("\t\tTOC margin" + toc_width);
@@ -526,9 +518,8 @@ var wiki_toc=
         $("#content").css('margin-left',  o.frame_content);
     },
     
-    frame_move_left:function(o)
+    frame_move_left:function(pixels_to_move)
     {
-        var pixels_to_move = 30;
         var margin_left;
         
         if (db.get_wikitoc_on_lhs())
@@ -536,8 +527,8 @@ var wiki_toc=
             margin_left = parseInt($("#left-navigation").css('margin-left'));
             margin_left -= pixels_to_move;
             
-            if (margin_left  > 10)  //hardcoded
-            {		
+            if (margin_left  > 80)  //hardcoded
+            {
                 margin_left = parseInt($("#left-navigation").css('margin-left'));
                 margin_left -= pixels_to_move;
                 margin_left += "px";
@@ -549,20 +540,19 @@ var wiki_toc=
                 $("#content").css('margin-left',  margin_left);
                 
                 var toc_width = parseInt($("#lhs_toc").css('width'));
-                toc_width -= pixels_to_move;
-                toc_width += "px";
-                $("#lhs_toc").css('width',  toc_width);
                 db.set_wikitoc_margin_position(toc_width); 
-                
+            } else 
+            {
+                //user is trying to resize the lhs_toc to too small a size, undo what he did
+                var original_margin = parseInt($("#left-navigation").css('margin-left'));
+                $("#lhs_toc").css('width',  original_margin);
             }
         }
     },
     
-    frame_move_right:function(o)
+    frame_move_right:function(pixels_to_move)
     {
-        var pixels_to_move = 30;
         var margin_left;
-        
         if (db.get_wikitoc_on_lhs())
         {
             margin_left = parseInt($("#left-navigation").css('margin-left'));
@@ -576,9 +566,6 @@ var wiki_toc=
             $("#content").css('margin-left',  margin_left);
             
             var toc_width = parseInt($("#lhs_toc").css('width'));
-            toc_width += pixels_to_move;
-            toc_width += "px";
-            $("#lhs_toc").css('width',  toc_width);
             db.set_wikitoc_margin_position(toc_width); 
         }
         
@@ -692,11 +679,8 @@ var wiki_toc=
     {
         /*
             Docs for EventTarget.addEventListener:
-                target.addEventListener(type, listener[, useCapture]);
-                target.addEventListener(type, listener[, useCapture, wantsUntrusted Non-standard]); // Gecko/Mozilla only
-            
-                    type A string representing the event type to listen for.
-                    listener The object that receives a notification when an event of the specified type occurs. This must be an object implementing the EventListener interface, or simply a JavaScript function.
+            target.addEventListener(type, listener[, useCapture]);
+            target.addEventListener(type, listener[, useCapture, wantsUntrusted Non-standard]); // Gecko/Mozilla only
         */
         var oop=this;
         if (o.addEventListener){
@@ -724,9 +708,9 @@ var wiki_toc=
 
 
 $(document).ready(function() {
-	var jqUI_CssSrc = GM_getResourceText ("jqUI_CSS");
-	GM_addStyle (jqUI_CssSrc);
-	util.debug("wiki_toc.init({}) start");
-	wiki_toc.init({});
-	util.debug("wiki_toc.init({}) exit");
+    var jqUI_CssSrc = GM_getResourceText ("jqUI_CSS");
+    GM_addStyle (jqUI_CssSrc);
+    util.debug("wiki_toc.init({}) start");
+    wiki_toc.init({});
+    util.debug("wiki_toc.init({}) exit");
 });
