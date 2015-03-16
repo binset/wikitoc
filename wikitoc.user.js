@@ -234,6 +234,7 @@ var wiki_toc=
         // then run toc_toggle_left()
         // then adds the page_scroll event
         
+        o.events = {}; //stores hash of event handlers
         db.set_wikitoc_status(true);
         
         if (db.get_wikitoc_status() == true) 
@@ -243,14 +244,13 @@ var wiki_toc=
             util.debug("Initialising wiki_toc()...2");
             this.init_toc_chapter_listing(o);
             util.debug("Initialising wiki_toc()...3");
-            //this.init_saved_values(o);
-            util.debug("Initialising wiki_toc()...4");
             
             if (db.get_wikitoc_on_lhs() == null)
             {
                 //initialise wikitoc on lhs for new sites to be LHS
                 db.set_wikitoc_on_lhs(true);
             }
+            util.debug("Initialising wiki_toc()...4");
             
             if (db.get_wikitoc_on_lhs() == true)
             {
@@ -260,22 +260,24 @@ var wiki_toc=
             this.init_html_buttons(o);
             util.debug("Initialising wiki_toc()...6");
             this.init_events(o);
-            util.debug("DEBUG:Done with initialising wiki_toc");
+            util.debug("Initialising wiki_toc() is done!");
         } else {
-            util.debug("DEBUG:wiki_toc is not running");
+            util.debug("wiki_toc() is not running");
         }
         
     },
     
     init_events:function(o)
     {
-        this.addevt(window,'scroll','page_scroll',o);
-        this.page_scroll(o);
+        this.event_add(o, window,'scroll','event_page_scroll',o);
+        this.event_page_scroll(o);
         
         var toctoggle = document.getElementById("toctoggle");
-        this.addevt(toctoggle,'click','toc_toggle',o);
+        this.event_add(o, toctoggle,'click','toc_toggle',o);
         
-        this.addevt(window,'scroll','toc_scroll_lock',o);
+        this.event_add(o, window,'scroll','event_toc_scroll_lock',o);
+        this.event_toc_scroll_lock(o);
+
     },
     
     init_save_positions:function(o)
@@ -393,7 +395,6 @@ var wiki_toc=
             toc_width = $("#p-namespaces")[0].getBoundingClientRect().left ;
         }
         
-        util.debug("toc_toggle_left() toc_height:" + toc_height + " toc_width:" + toc_width);
      
         //$("#lhs_toc").css({"z-index": "9999", height: toc_height, width: toc_width, overflow: 'auto', border: '1px solid black', position: 'fixed', left:'2px', top: '0px' });
         var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
@@ -404,7 +405,6 @@ var wiki_toc=
 
 
         //$("#toc").clone().attr('id', 'lhs_toc').insertAfter("#mw-panel");
-        util.debug('zzz' + $("#toc"));
         var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
         cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
         cloned_toc.insertAfter("#p-lang");
@@ -424,23 +424,16 @@ var wiki_toc=
         //$("#lhs_toc").resizable( "option", "handles", "e" );
         
         var that = this;
-        util.debug('resizing starting');
         $('#lhs_toc').resizable({
           handles: "e",
           stop: function(e, ui){
-              var pixels_moved = Math.abs(ui.size.width - ui.originalSize.width);
-              util.debug("original width" + ui.originalSize.width);
-              util.debug("new      width" + ui.size.width);
-              util.debug("going to move:" + (ui.size.width-ui.originalSize.width));
-
-              that.update_content_margin();
+              that.event_update_content_margin(o);
             },
         });
-        util.debug("\t\tresize!");
         db.set_wikitoc_on_lhs(true);
         
         //resize the main content section on RHS on fit the size of the TOC on LHS
-        this.update_content_margin();
+        this.event_update_content_margin(o);
     },
     
     toc_toggle_right:function(o)
@@ -449,21 +442,16 @@ var wiki_toc=
         uses original toc values from o.toc_original dictionary.
         */
         
-        $("#lhs_toc").css({"z-index": "9999", height: o.toc_original["height"], width: o.toc_original["width"], overflow: o.toc_original["overflow"],
-                       border: o.toc_original["border"], position: o.toc_original["position"], left:o.toc_original["left"], top: o.toc_original["top"] });
+        $("#lhs_toc").resizable( "destroy" ); //remove scrolling and associated events
         $("#lhs_toc").remove();
-        this.frame_restore(o);
         
+        $("#left-navigation").css('margin-left', o.frame_left_navigation);
+        $("#content").css('margin-left',  o.frame_content);
         db.set_wikitoc_on_lhs(false);
     },
     
-    frame_restore:function(o)
-    {
-        $("#left-navigation").css('margin-left', o.frame_left_navigation);
-        $("#content").css('margin-left',  o.frame_content);
-    },
     
-    update_content_margin:function()
+    event_update_content_margin:function(o)
     {
         //based on the width of lhs_toc, update the position of the main CONTENTS margin to follow that of the lhs_toc
         var margin_left;
@@ -477,9 +465,9 @@ var wiki_toc=
         }
     },
 
-    toc_scroll_lock:function(o)
+    event_toc_scroll_lock:function(o)
     {
-        //lock position of lhs toc if user scrolls below the lhs panel
+        //event that lock position of lhs toc if user scrolls below the lhs panel
 
 
           var lhs_panel_yposition = $("#p-lang").position()['top'];
@@ -489,8 +477,6 @@ var wiki_toc=
           var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
           var lhs_toc_scroll_lock = util.pixels_addition(lhs_toc_position, lhs_mwpanel_yposition);
 
-          util.debug('scrolltop:' + document.documentElement.scrollTop);
-          util.debug('toc position:' + lhs_toc_position);
 
           var curr_scrolltop = (document.documentElement || document.body.parentNode || document.body).scrollTop;
           if (curr_scrolltop > lhs_toc_scroll_lock) {
@@ -502,7 +488,7 @@ var wiki_toc=
           }
     },
     
-    page_scroll:function(o)
+    event_page_scroll:function(o)
     {
         /** event that gets called when user scrolls.
             Hightlights current chapter in the TOC
@@ -581,7 +567,7 @@ var wiki_toc=
     },
     
     
-    addevt:function(o,event_name,function_name,p)
+    event_add:function(o, event_object, event_name, function_name,p)
     {
         /*
             Docs for EventTarget.addEventListener:
@@ -589,15 +575,44 @@ var wiki_toc=
             target.addEventListener(type, listener[, useCapture, wantsUntrusted Non-standard]); // Gecko/Mozilla only
         */
         var oop=this;
-        if (o.addEventListener){
-            o.addEventListener(event_name,function(e){ return oop[function_name](p,e);}, false);
-            //util.debug("adding event listener:" + event_name + " function_name:" + function_name + " p:" + p);
+        var event_handler;
+        if (event_object.addEventListener){
+            o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e);};
+            event_handler = o.events[event_object + event_name + function_name];
+
+            event_object.addEventListener(event_name, event_handler, false);
+            util.debug("EVENT: adding event listener:" + event_name + " function_name:" + function_name + " p:" + p);
         }
-        else if (o.attachEvent){
-            o.attachEvent('on'+event_name,function(e){ return oop[function_name](p,e); });
-            //util.debug("adding attach event :" + event_name + " function_name:" + function_name + " p:" + p);
+        else if (event_object.attachEvent){
+            o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e); };
+            event_handler = o.events[event_object + event_name + function_name];
+
+            event_object.attachEvent('on'+event_name, event_handler);
+            util.debug("EVENT: adding attach event :" + event_name + " function_name:" + function_name + " p:" + p);
+        } else 
+        {
+            util.debug("EVENT: unable to add event :" + event_name + " function_name:" + function_name + " p:" + p);
         }
     },
+    event_remove:function (o, event_object,event_name, function_name) 
+    {
+        var event_handler = o.events[event_object + event_name + function_name];
+        util.debug("event_remove() what is event_handler:" + event_handler);
+        if (event_object.removeEventListener)  
+        {
+            util.debug("EVENT: removing event:" + event_name + " handler:" + handler);
+            event_object.removeEventListener(event_name,event_handler,false);
+        }
+        else if (event_object.detachEvent)
+        {
+            util.debug("EVENT: removing event:" + event_name + " handler:" + handler);
+            event_object.detachEvent ('on'+event_name,event_handler); 
+        } else 
+        {
+            util.debug("EVENT: unable to remove event:" + event_name + " handler:" + handler);
+        }
+    },
+
     
     pos:function(obj)
     {
@@ -609,7 +624,7 @@ var wiki_toc=
             obj=obj.offsetParent;
         }
         return rtn;
-    }
+    },
 };
 
 
