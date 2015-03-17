@@ -91,7 +91,6 @@ var db =
         {
             return gm_values[hostname]["is_wikitoc_on_lhs"];
         }
-        
         return null;
     },
     
@@ -112,7 +111,45 @@ var db =
         
         console.log(gm_values);
         db.gm_serialize(gm_values);
+    },
+
+
+    get_wikitoc_locked:function()
+    {
+        var gm_values = db.gm_deserialize();
+        var hostname = window.location.host;
+        if ( ! gm_values.hasOwnProperty(hostname))
+        {
+            return null;
+        }
+        else if (! gm_values[hostname].hasOwnProperty("is_wikitoc_locked"))
+        {
+            return null;
+        }
+        else
+        {
+            return gm_values[hostname]["is_wikitoc_locked"];
+        }
+        return null;
+    },
+    
+    set_wikitoc_locked:function(is_wikitoc_locked)
+    {
+        /** set true if user specifies wikitoc to be locked and always appearing on the LHS
+            false otherwise (i.e. TOC is floating)
+        */
         
+        var gm_values = db.gm_deserialize();
+        var hostname = window.location.host;
+        if ( ! gm_values.hasOwnProperty(hostname))
+        {
+            console.log("initialise gm_values[" + hostname + "]");
+            gm_values[hostname] = {};
+        }
+        gm_values[hostname]["is_wikitoc_locked"] = is_wikitoc_locked;
+        
+        console.log(gm_values);
+        db.gm_serialize(gm_values);
     },
     
     get_wikitoc_margin_position:function()
@@ -274,6 +311,12 @@ var wiki_toc=
         
         var toctoggle = document.getElementById("toctoggle");
         this.event_add(o, toctoggle,'click','toc_toggle',o);
+
+        var toc_lock = document.getElementById("toc_lock");
+        this.event_add(o, toc_lock,'click','event_toc_lock',o);
+
+        var toc_unlock = document.getElementById("toc_unlock");
+        this.event_add(o, toc_unlock,'click','event_toc_unlock',o);
         
         this.event_add(o, window,'scroll','event_toc_scroll_lock',o);
         this.event_toc_scroll_lock(o);
@@ -321,8 +364,20 @@ var wiki_toc=
         toctoggle_img.setAttribute("alt", "toggle_toc");
         toctoggle.appendChild(toctoggle_img);
         
+        var toc_lock = document.createElement('a');
+        toc_lock.setAttribute("id", "toc_lock");
+        toc_lock.setAttribute("title", "Click here to lock the LHS TOC");
+        toc_lock.appendChild(document.createTextNode("  | lock toc")); 
+
+        var toc_unlock = document.createElement('a');
+        toc_unlock.setAttribute("id", "toc_unlock");
+        toc_unlock.setAttribute("title", "Click here to unlock the LHS TOC");
+        toc_unlock.appendChild(document.createTextNode("  | unlock toc")); 
+
         //Now add all the created elements into the HTML document
         toctitle.appendChild(toctoggle);
+        toctitle.appendChild(toc_lock);
+        toctitle.appendChild(toc_unlock);
     },
     
     init_toc_chapter_listing:function(o)
@@ -465,27 +520,48 @@ var wiki_toc=
         }
     },
 
+    event_toc_lock:function(o)
+    {
+        db.set_wikitoc_locked(true);
+        this.event_toc_scroll_lock(o); //refresh the toc
+    },
+
+    event_toc_unlock:function(o)
+    {
+        db.set_wikitoc_locked(false);
+        this.event_toc_scroll_lock(o); //refresh the toc
+    },
+                              
     event_toc_scroll_lock:function(o)
     {
         //event that lock position of lhs toc if user scrolls below the lhs panel
 
-
-          var lhs_panel_yposition = $("#p-lang").position()['top'];
-          var lhs_panel_height = $("#p-lang").height();
-          var lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
-
-          var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
-          var lhs_toc_scroll_lock = util.pixels_addition(lhs_toc_position, lhs_mwpanel_yposition);
-
-
-          var curr_scrolltop = (document.documentElement || document.body.parentNode || document.body).scrollTop;
-          if (curr_scrolltop > lhs_toc_scroll_lock) {
+        if (db.get_wikitoc_locked() == true)
+        {
+            //lock the position
             $("#lhs_toc").css("top", 0);
             $("#lhs_toc").css("position", "fixed");
-          } else {
-            $("#lhs_toc").css("top", lhs_toc_position);
-            $("#lhs_toc").css("position", "absolute");
-          }
+        } else 
+        {
+            var lhs_panel_yposition = $("#p-lang").position()['top'];
+            var lhs_panel_height = $("#p-lang").height();
+            var lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
+
+            var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
+            var lhs_toc_scroll_lock = util.pixels_addition(lhs_toc_position, lhs_mwpanel_yposition);
+
+
+            var curr_scrolltop = (document.documentElement || document.body.parentNode || document.body).scrollTop;
+            if (curr_scrolltop > lhs_toc_scroll_lock) {
+                //lock the position
+                $("#lhs_toc").css("top", 0);
+                $("#lhs_toc").css("position", "fixed");
+            } else {
+                //let it float
+                $("#lhs_toc").css("top", lhs_toc_position);
+                $("#lhs_toc").css("position", "absolute");
+            }
+        }
     },
     
     event_page_scroll:function(o)
