@@ -25,7 +25,6 @@
     It also retains the ability for the user to jump to different sections on the TOC by clicking on the links.
 */
 
-
 var db = 
 {
     /** 
@@ -321,6 +320,7 @@ var wiki_toc=
         this.event_add(o, window,'scroll','event_toc_scroll_lock',o);
         this.event_toc_scroll_lock(o);
 
+        this.event_add(o, window,'resize','toc_toggle_left',o);
     },
     
     init_save_positions:function(o)
@@ -459,36 +459,33 @@ var wiki_toc=
         lhs_toc_position += "px";
 
 
-        //$("#toc").clone().attr('id', 'lhs_toc').insertAfter("#mw-panel");
-        var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
-        cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
-        cloned_toc.insertAfter("#p-lang");
+        if ($("#lhs_toc").length == 0)
+        {
+            //lhs_toc doesn't exist, we can recreate it
+
+            var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
+            cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
+            cloned_toc.insertAfter("#p-lang");
+
+            var that = this;
+            $('#lhs_toc').resizable({
+              handles: "e",
+              stop: function(e, ui){
+                  that.event_update_content_margin(o);
+                },
+            });
+        }
+
         $("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
         $("#lhs_toc").css("display", "block");
         $("#lhs_toc").css("padding-left", "0px");
         $("#lhs_toc").css("padding-right", "0px");
 
-        //var css_link = document.createElement("link");
-        //css_link.setAttribute("rel", "stylesheet");
-        //css_link.setAttribute("href", "https://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css");
-        //document.head.appendChild(css_link);
-
-        //$("#lhs_toc").attr("class", "toc ui-widget-content ui-resizable");
-        //$('#lhs_toc').resizable()
-        //$("#lhs_toc").resizable("enable");
-        //$("#lhs_toc").resizable( "option", "handles", "e" );
-        
-        var that = this;
-        $('#lhs_toc').resizable({
-          handles: "e",
-          stop: function(e, ui){
-              that.event_update_content_margin(o);
-            },
-        });
         db.set_wikitoc_on_lhs(true);
         
         //resize the main content section on RHS on fit the size of the TOC on LHS
         this.event_update_content_margin(o);
+        this.event_toc_scroll_lock(o);
     },
     
     toc_toggle_right:function(o)
