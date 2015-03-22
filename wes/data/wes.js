@@ -217,6 +217,12 @@ var wiki_toc=
             util.debug("Initialising wiki_toc()...6");
             this.init_events(o);
             util.debug("Initialising wiki_toc() is done!");
+            util.debug("");
+            util.debug("is_wes_enabled           " + is_wes_enabled);
+            util.debug("is_wikitoc_on_lhs        " + is_wikitoc_on_lhs);
+            util.debug("is_wikitoc_locked        " + is_wikitoc_locked);
+            util.debug("wikitoc_margin_position  " + wikitoc_margin_position);
+
         } else {
             util.debug("wiki_toc() is not running");
         }
@@ -539,6 +545,10 @@ var wiki_toc=
         */
         
         var toc_table_ul = document.getElementById("lhs_toc");
+        if (toc_table_ul == null)
+        {
+            return;
+        }
         
         //Given the <ul> of the TOC, find each <a href> and look for current_section
         var anchor_links = toc_table_ul.getElementsByTagName("a");
@@ -652,12 +662,6 @@ var wiki_toc=
 
 
 $(document).ready(function() {
-    util.debug("wiki_toc.init({}) start");
     db.init();
-    wiki_toc.init({});
-    util.debug("wiki_toc.init({}) exit");
-    util.debug( is_wes_enabled );
-    util.debug( is_wikitoc_on_lhs);
-    util.debug( is_wikitoc_locked);
-    util.debug( wikitoc_margin_position);
+    setTimeout( function() { wiki_toc.init({}) }, 200);
 });
