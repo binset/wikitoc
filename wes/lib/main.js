@@ -7,7 +7,7 @@ let ss = require("sdk/simple-storage");
 let buttons = require("sdk/ui/button/toggle");
 let tabs = require("sdk/tabs");
 let pageWorkers = require("sdk/page-worker");
-let workers = require("sdk/content/worker");
+//let workers = require("sdk/content/worker");
 
 let localStorage = ss.storage;
 localStorage.getItem = function(key) {
@@ -20,14 +20,16 @@ localStorage.removeItem = function(key) {
 	delete ss.storage[key];
 };
 
-let worker =  workers.Worker({
-  window: require("sdk/window/utils").getMostRecentBrowserWindow(),
-  contentScript:
-    "self.port.on('hello', function(name) { " +
-    "  self.port.emit('response', window.location.href); " +
-    "});"
-});
-
+let workers = [];
+function getActiveWorker() {
+    let tab = tabs.activeTab;
+    for (let i in workers) {
+        if ((typeof workers[i].tab !== 'undefined') && (tab.title === workers[i].tab.title)) {
+            return workers[i];
+        }
+    }
+    return null;
+}
 
 
 const wes_activated = {
@@ -67,10 +69,14 @@ function handle_activate_click(state) {
     button_activated.state(button_activated, wes_deactivated);
   }
 
-    console.log("main.js: handle_activate_click()");
-    worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-    worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
-    worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
+    worker = getActiveWorker();
+    if (worker)
+    {
+        console.log("main.js: handle_activate_click()");
+        worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
+        worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
+        worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
+    }
 }
 
 var button_locked = buttons.ToggleButton({
@@ -81,7 +87,7 @@ var button_locked = buttons.ToggleButton({
 });
 function handle_lock_click(state) {
     button_locked.checked = !button_locked.checked;
-    localStorage.setItem("is_wikitoc_locked", wes_locked.checked)
+    localStorage.setItem("is_wikitoc_locked", button_locked.checked)
 
     if (button_locked.checked == true) {
         button_locked.state(button_locked, wes_locked);
@@ -90,10 +96,14 @@ function handle_lock_click(state) {
         button_locked.state(button_locked, wes_unlocked);
     }
 
-    console.log("main.js: handle_lock_click()");
-    worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-    worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
-    worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
+    worker = getActiveWorker();
+    if (worker)
+    {
+        console.log("main.js: handle_lock_click()");
+        worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
+        worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
+        worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
+    }
 }
 
 function init() {
@@ -167,6 +177,7 @@ pageMod.PageMod({
     self.data.url("vendor/jqueryui/1.8/themes/base/jquery-ui.css"),
   ],
   onAttach: function(worker) {
+    workers.push(worker);
     worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
     worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
     worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));

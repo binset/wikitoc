@@ -663,5 +663,5 @@ var wiki_toc=
 
 $(document).ready(function() {
     db.init();
-    setTimeout( function() { wiki_toc.init({}) }, 200);
+    setTimeout( function() { wiki_toc.init({}) }, 50);
 });
