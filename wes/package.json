@@ -1,0 +1,13 @@
+{
+  "name": "wiki_enhancement_suite",
+  "title": "wiki_enhancement_suite",
+  "id": "jid1-cMSHi7uqCHRhsQ",
+  "description": "Enhances the Table of Contents on wikimedia sites including Wikipedia",
+  "author": "",
+  "license": "MPL 2.0",
+  "version": "0.1",
+  "homepage": "google.com/",
+  "readmeFilename": "README.md",
+  "icon": "data/on64.png",
+  "icon64": "data/on64.png"
+}
