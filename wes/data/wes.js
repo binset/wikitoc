@@ -43,6 +43,7 @@ var db =
         
     */
 
+
     init:function()
     {
         //initialise content script port listener events
@@ -57,9 +58,19 @@ var db =
 
         self.port.on("is_wikitoc_on_lhs", function(payload) {
             if (payload === true)
+            {
                 is_wikitoc_on_lhs = true;
+                wiki_toc.toc_toggle_left();
+            }
             else 
+            {
                 is_wikitoc_on_lhs = false;
+                wiki_toc.toc_toggle_right();
+            }
+
+            //resize the main content section on RHS on fit the size of the TOC on LHS
+            wiki_toc.event_update_content_margin();
+
             util.debug("db: porttttttttt setting is_wikitoc_on_lhs:" + payload);
         });
 
@@ -68,6 +79,8 @@ var db =
                 is_wikitoc_locked = true;
             else 
                 is_wikitoc_locked = false;
+
+            wiki_toc.event_toc_scroll_lock();
             util.debug("db: porttttttttt setting is_wikitoc_locked:" + payload);
         });
 
@@ -76,7 +89,7 @@ var db =
             util.debug("db: porttttttttt setting wikitoc_margin_position:" + payload);
         });
     },
-    
+
     get_wikitoc_status:function()
     {
         util.debug("getting is_wes_enabled:" + is_wes_enabled);
@@ -191,8 +204,9 @@ var wiki_toc=
         // then adds the page_scroll event
         
         o.events = {}; //stores hash of event handlers
-        db.set_wikitoc_status(true);
         
+        db.set_wikitoc_status(true);
+
         if (db.get_wikitoc_status() == true) 
         {
             util.debug("Initialising wiki_toc()...1");
@@ -661,7 +675,23 @@ var wiki_toc=
 };
 
 
-$(document).ready(function() {
-    db.init();
-    setTimeout( function() { wiki_toc.init({}) }, 50);
+self.port.on("init_wes", function(json_string) {
+    if ($("#toc").length == 0 ||  
+        $("#left-navigation").length == 0 || 
+        $("#content").length == 0 || 
+        $("#toctitle").length == 0 ) 
+    {
+        util.debug("wiki_toc() is not going to run as this is not a wiki page with a toc");
+        return;
+    } else 
+    {
+        var json_obj = JSON.parse(json_string);
+        db.set_wikitoc_status(json_obj.is_wes_enabled);
+        db.set_wikitoc_locked(json_obj.is_wikitoc_locked);
+        db.set_wikitoc_on_lhs(json_obj.is_wikitoc_on_lhs);
+        db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
+        db.init()
+
+        setTimeout( function() { wiki_toc.init({}) }, 50);
+    }
 });

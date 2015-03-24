@@ -30,14 +30,20 @@ function getActiveWorker() {
     }
     return null;
 }
+function detachWorker(worker, workerArray) {
+	let index = workerArray.indexOf(worker);
+	if (index !== -1) {
+		workerArray.splice(index, 1);
+	}
+}
 
 
-const wes_activated = {
+const lhswikitoc_activated = {
   "label": "Wikipedia Enhancement Suite is now Activated",
   "icon": "./on64.png",
 }
 
-const wes_deactivated = {
+const lhswikitoc_deactivated = {
   "label": "Wikipedia Enhancement Suite is now Deactivated",
   "icon": "./off64.png",
 }
@@ -54,19 +60,19 @@ const wes_unlocked = {
 
 var button_activated = buttons.ToggleButton({
   id: "button_activated",
-  label: wes_activated.label,
-  icon: wes_activated.icon,
+  label: lhswikitoc_activated.label,
+  icon: lhswikitoc_activated.icon,
   onClick: handle_activate_click
 });
 function handle_activate_click(state) {
   button_activated.checked = !button_activated.checked;
-  localStorage.setItem("is_wes_enabled", button_activated.checked)
+  localStorage.setItem("is_wikitoc_on_lhs", button_activated.checked)
 
   if (button_activated.checked == true) {
-    button_activated.state(button_activated, wes_activated);
+    button_activated.state(button_activated, lhswikitoc_activated);
   }
   else {
-    button_activated.state(button_activated, wes_deactivated);
+    button_activated.state(button_activated, lhswikitoc_deactivated);
   }
 
     worker = getActiveWorker();
@@ -109,18 +115,18 @@ function handle_lock_click(state) {
 function init() {
     {
         //is_wes_enabled
-        let is_wes_enabled = localStorage.getItem("is_wes_enabled");
-        if (is_wes_enabled == undefined || is_wes_enabled == null) {
-            localStorage.setItem("is_wes_enabled", true);
+        let is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
+        if (is_wikitoc_on_lhs == undefined || is_wikitoc_on_lhs == null) {
+            localStorage.setItem("is_wikitoc_on_lhs", true);
         }
 
-        is_wes_enabled = localStorage.getItem("is_wes_enabled");
-        if (is_wes_enabled == true) {
+        is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
+        if (is_wikitoc_on_lhs == true) {
             button_activated.checked = true;
-            button_activated.state(button_activated, wes_activated);
+            button_activated.state(button_activated, lhswikitoc_activated);
         } else {
             button_activated.checked = false;
-            button_activated.state(button_activated, wes_deactivated);
+            button_activated.state(button_activated, lhswikitoc_deactivated);
         }
     }
 
@@ -178,9 +184,20 @@ pageMod.PageMod({
   ],
   onAttach: function(worker) {
     workers.push(worker);
-    worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-    worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
-    worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
+    worker.on('detach', function () {
+        detachWorker(this, workers);
+    });
+
+    var json_obj = 
+    {
+        "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
+        "is_wikitoc_locked": localStorage.getItem("is_wikitoc_locked"),
+        "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
+        "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
+    };
+    var json_string = JSON.stringify(json_obj);
+
+    worker.port.emit("init_wes", json_string);
 
     worker.port.on("is_wes_enabled", function(payload) {
         console.log("main.js: setting is wikitoc_enabled:" + payload);
@@ -189,10 +206,22 @@ pageMod.PageMod({
     worker.port.on("is_wikitoc_on_lhs", function(payload) {
         console.log("main.js: setting is_wikitoc_on_lhs:" + payload);
         localStorage.setItem("is_wikitoc_on_lhs", payload);
+        if (payload == true) {
+            button_activated.state(button_activated, lhswikitoc_activated);
+        }
+        else {
+            button_activated.state(button_activated, lhswikitoc_deactivated);
+        }
     });
     worker.port.on("is_wikitoc_locked", function(payload) {
         console.log("main.js: setting is_wikitoc_locked:" + payload);
         localStorage.setItem("is_wikitoc_locked", payload);
+        if (payload == true) {
+            button_locked.state(button_locked, wes_locked);
+        }
+        else {
+            button_locked.state(button_locked, wes_unlocked);
+        }
     });
     worker.port.on("wikitoc_margin_position", function(payload) {
         console.log("main.js: setting wikitoc_margin_position:" + payload);
