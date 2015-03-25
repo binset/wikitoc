@@ -8,6 +8,6 @@
   "version": "0.1a",
   "homepage": "google.com/",
   "readmeFilename": "README.md",
-  "icon": "data/on64.png",
-  "icon64": "data/on64.png"
+  "icon": "data/browser_on.png",
+  "icon64": "data/browser_on.png"
 }

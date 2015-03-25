@@ -243,7 +243,7 @@ var wiki_toc=
     init_events:function()
     {
         this.event_add(window,'scroll','event_page_scroll',this.o);
-        this.event_page_scroll(this.o);
+        this.event_page_scroll();
         
         var toctoggle = document.getElementById("toctoggle");
         this.event_add(toctoggle,'click','toc_toggle',this.o);
@@ -375,21 +375,21 @@ var wiki_toc=
     set_state_on_and_unlocked:function()
     {
         /** activates lhstoc on the left hand panel, and let it float */
-        this.event_toc_unlock(this.o);
-        this.toc_toggle_left(this.o);
+        this.event_toc_unlock();
+        this.toc_toggle_left();
     },
 
     set_state_on_and_locked:function()
     {
         /** activates lhstoc on the left hand panel, and set it locked, so it always appear on lhs*/
-        this.event_toc_lock(this.o);
-        this.toc_toggle_left(this.o);
+        this.event_toc_lock();
+        this.toc_toggle_left();
     },
 
     set_state_off:function()
     {
         /** deactivate lhstoc on the left hand panel*/
-        this.toc_toggle_right(this.o);
+        this.toc_toggle_right();
     },
         
     toc_toggle_left:function()
@@ -539,7 +539,7 @@ var wiki_toc=
             this.o.chapters_listing[nu][1].className=this.o.chapters_listing[nu][3];
             
             var current_section = this.o.chapters_listing[nu][0].getAttribute("id");
-            this.update_toc(this.o, current_section);
+            this.update_toc(current_section);
         }
     },
     
@@ -547,7 +547,7 @@ var wiki_toc=
     {
         /**given the name of the current_section, update the toc (table of contents) to highlight this section, and also unhighlight any other highlighted sections
         */
-        
+
         var toc_table_ul = document.getElementById("lhs_toc");
         if (toc_table_ul == null)
         {

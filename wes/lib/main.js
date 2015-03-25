@@ -40,22 +40,22 @@ function detachWorker(worker, workerArray) {
 
 const lhswikitoc_activated = {
   "label": "Wikipedia Enhancement Suite is now Activated",
-  "icon": "./on64.png",
+  "icon": "./browser_on.png",
 }
 
 const lhswikitoc_deactivated = {
   "label": "Wikipedia Enhancement Suite is now Deactivated",
-  "icon": "./off64.png",
+  "icon": "./browser_off.png",
 }
 
 const wes_locked = {
   "label": "Table of Contents on LHS is now locked",
-  "icon": "./on64.png",
+  "icon": "./locked.png",
 }
 
 const wes_unlocked = {
   "label": "Table of Contents on LHS is now unlocked",
-  "icon": "./off64.png",
+  "icon": "./unlocked.png",
 }
 
 var button_activated = buttons.ToggleButton({
