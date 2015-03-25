@@ -60,12 +60,12 @@ var db =
             if (payload === true)
             {
                 is_wikitoc_on_lhs = true;
-                wiki_toc.toc_toggle_left();
+                wiki_toc.toc_toggle_left(o);
             }
             else 
             {
                 is_wikitoc_on_lhs = false;
-                wiki_toc.toc_toggle_right();
+                wiki_toc.toc_toggle_right(o);
             }
 
             //resize the main content section on RHS on fit the size of the TOC on LHS
@@ -400,7 +400,6 @@ var wiki_toc=
         /**toggle TOC to LHS
         */
         
-        util.debug("toc_toggle_left 1");
         var toc_height = window.innerHeight.toString() + "px";
         //var toc_width = $("#content").offsetLeft + "px";
         //var toc_width =  $("#mw-head-base").css('margin-left');
@@ -411,7 +410,6 @@ var wiki_toc=
             toc_width = $("#p-namespaces")[0].getBoundingClientRect().left ;
         }
         
-        util.debug("toc_toggle_left 2");
      
         //$("#lhs_toc").css({"z-index": "9999", height: toc_height, width: toc_width, overflow: 'auto', border: '1px solid black', position: 'fixed', left:'2px', top: '0px' });
         var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
@@ -420,11 +418,9 @@ var wiki_toc=
         lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
         lhs_toc_position += "px";
 
-        util.debug("toc_toggle_left 3");
 
         if ($("#lhs_toc").length == 0)
         {
-        util.debug("toc_toggle_left 3a");
             //lhs_toc doesn't exist, we can recreate it
 
             var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
@@ -435,12 +431,10 @@ var wiki_toc=
             $('#lhs_toc').resizable({
               handles: "e",
               stop: function(e, ui){
-        util.debug("toc_toggle_left 3b");
                   that.event_update_content_margin(o);
                 },
             });
         }
-        util.debug("toc_toggle_left 4");
 
         $("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
         $("#lhs_toc").css("display", "block");
@@ -449,12 +443,9 @@ var wiki_toc=
 
         db.set_wikitoc_on_lhs(true);
         
-        util.debug("toc_toggle_left 5");
         //resize the main content section on RHS on fit the size of the TOC on LHS
         this.event_update_content_margin(o);
-        util.debug("toc_toggle_left 6");
         this.event_toc_scroll_lock(o);
-        util.debug("toc_toggle_left 7");
     },
     
     toc_toggle_right:function(o)
@@ -674,6 +665,45 @@ var wiki_toc=
     },
 };
 
+self.port.on("refresh_wes", function(json_string) {
+	var json_obj = JSON.parse(json_string);
+
+	util.debug("refresh_wes(): refreshingggggg!!!");
+	util.debug("refresh_wes(): " +  db.get_wikitoc_status() );
+	util.debug("refresh_wes(): " +  db.get_wikitoc_on_lhs() );
+	util.debug("refresh_wes(): " +  db.get_wikitoc_locked() );
+	util.debug("refresh_wes(): " +  db.get_wikitoc_margin_position() );
+
+	if (db.get_wikitoc_on_lhs() == true && db.get_wikitoc_locked() == true)
+	{
+		wiki_toc.toc_toggle_left(o);
+		wiki_toc.set_state_on_and_locked();
+		wiki_toc.event_toc_scroll_lock()
+		util.debug("refresh_wes(): lets set wikitoc on LHS and locked");
+		util.debug("refresh_wes(): lets update toc scroll lock");
+	}
+	else if (db.get_wikitoc_on_lhs() == true && db.get_wikitoc_locked() == false)
+	{
+		wiki_toc.toc_toggle_left(o);
+		wiki_toc.set_state_on_and_unlocked();
+		util.debug("refresh_wes(): lets set wikitoc on LHS and unlocked");
+		util.debug("refresh_wes(): lets update toc scroll lock");
+	}
+	else if (db.get_wikitoc_on_lhs() == false)
+	{
+		util.debug("refresh_wes(): lets toggle right");
+		wiki_toc.toc_toggle_right(o);
+	}
+	else 
+	{
+		util.debug("refresh_wes(): lets do nothing");
+	}
+
+	wiki_toc.event_update_content_margin();
+	util.debug("refresh_wes(): lets update content margin");
+});
+
+var o = {};
 
 self.port.on("init_wes", function(json_string) {
     if ($("#toc").length == 0 ||  
@@ -692,6 +722,7 @@ self.port.on("init_wes", function(json_string) {
         db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
         db.init()
 
-        setTimeout( function() { wiki_toc.init({}) }, 50);
+        setTimeout( function() { wiki_toc.init(o) }, 50);
+
     }
 });

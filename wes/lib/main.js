@@ -174,6 +174,25 @@ function init() {
 
 
 init()
+
+tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
+tabs.open("https://en.wikipedia.org/wiki/Telstra");
+
+tabs.on('activate', function () {
+	if (/wikipedia/.test(tabs.activeTab.url))
+	{
+		console.log('active: ' + tabs.activeTab.url);
+		var json_obj = 
+		{
+			"is_wes_enabled": localStorage.getItem("is_wes_enabled"),
+			"is_wikitoc_locked": localStorage.getItem("is_wikitoc_locked"),
+			"is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
+			"wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
+		};
+		var json_string = JSON.stringify(json_obj);
+		worker.port.emit("refresh_wes", json_string);
+	}
+});
  
 // Create a page mod
 // It will run a script whenever a ".org" URL is loaded
