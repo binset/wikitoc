@@ -82,7 +82,11 @@ function handle_activate_click(state) {
         worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
         worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
         worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
-    }
+    } else
+	{
+        console.log("main.js: I can't find your worker mate");
+	}
+
 }
 
 var button_locked = buttons.ToggleButton({
@@ -109,7 +113,10 @@ function handle_lock_click(state) {
         worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
         worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
         worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
-    }
+    } else
+	{
+        console.log("main.js: I can't find your worker mate");
+	}
 }
 
 function init() {
