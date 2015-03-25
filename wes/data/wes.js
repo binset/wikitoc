@@ -25,10 +25,6 @@
     It also retains the ability for the user to jump to different sections on the TOC by clicking on the links.
 */
 
-var is_wes_enabled = null;
-var is_wikitoc_on_lhs = null;
-var is_wikitoc_locked = null;
-var wikitoc_margin_position = null;
 
 var db = 
 {
@@ -43,29 +39,33 @@ var db =
         
     */
 
+    is_wes_enabled: null,
+    is_wikitoc_on_lhs: null,
+    is_wikitoc_locked: null,
+    wikitoc_margin_position: null,
 
     init:function()
     {
         //initialise content script port listener events
         util.debug("db: initialisation");
         self.port.on("is_wes_enabled", function(payload) {
-            if (payload === true)
-                is_wes_enabled = true;
+            if (payload == true)
+                db.set_wikitoc_on_lhs(true);
             else 
-                is_wes_enabled = false;
+                db.set_wikitoc_on_lhs(false);
             util.debug("db: porttttttttt setting is_wes_enabled:" + payload);
         });
 
         self.port.on("is_wikitoc_on_lhs", function(payload) {
-            if (payload === true)
+            if (payload == true)
             {
-                is_wikitoc_on_lhs = true;
-                wiki_toc.toc_toggle_left(o);
+                db.set_wikitoc_on_lhs(true);
+                wiki_toc.toc_toggle_left();
             }
             else 
             {
-                is_wikitoc_on_lhs = false;
-                wiki_toc.toc_toggle_right(o);
+                db.set_wikitoc_on_lhs(false);
+                wiki_toc.toc_toggle_right();
             }
 
             //resize the main content section on RHS on fit the size of the TOC on LHS
@@ -75,52 +75,52 @@ var db =
         });
 
         self.port.on("is_wikitoc_locked", function(payload) {
-            if (payload === true)
-                is_wikitoc_locked = true;
+            if (payload == true)
+                db.set_wikitoc_locked(true);
             else 
-                is_wikitoc_locked = false;
+                db.set_wikitoc_locked(false);
 
             wiki_toc.event_toc_scroll_lock();
             util.debug("db: porttttttttt setting is_wikitoc_locked:" + payload);
         });
 
         self.port.on("wikitoc_margin_position", function(payload) {
-            wikitoc_margin_position = payload;
+            db.set_wikitoc_margin_position(payload);
             util.debug("db: porttttttttt setting wikitoc_margin_position:" + payload);
         });
     },
 
     get_wikitoc_status:function()
     {
-        util.debug("getting is_wes_enabled:" + is_wes_enabled);
-        return is_wes_enabled;
+        util.debug("getting is_wes_enabled:" + this.is_wes_enabled);
+        return this.is_wes_enabled;
     },
     
     set_wikitoc_status:function(payload)
     {
-        is_wes_enabled = payload;
-        self.port.emit("is_wes_enabled", is_wes_enabled);
-        util.debug("db: setting is_wes_enabled:" + is_wes_enabled);
+        this.is_wes_enabled = payload;
+        self.port.emit("is_wes_enabled", this.is_wes_enabled);
+        util.debug("db: setting is_wes_enabled:" + this.is_wes_enabled);
     },
     
     get_wikitoc_on_lhs:function()
     {
-        util.debug("db: getting is_wikitoc_on_lhs:" + is_wikitoc_on_lhs);
-        return is_wikitoc_on_lhs;
+        util.debug("db: getting is_wikitoc_on_lhs:" + this.is_wikitoc_on_lhs);
+        return this.is_wikitoc_on_lhs;
     },
     
     set_wikitoc_on_lhs:function(payload)
     {
-        is_wikitoc_on_lhs = payload;
-        self.port.emit("is_wikitoc_on_lhs", is_wikitoc_on_lhs);
-        util.debug("db: setting is_wikitoc_on_lhs:" + is_wikitoc_on_lhs);
+        this.is_wikitoc_on_lhs = payload;
+        self.port.emit("is_wikitoc_on_lhs", this.is_wikitoc_on_lhs);
+        util.debug("db: setting is_wikitoc_on_lhs:" + this.is_wikitoc_on_lhs);
     },
 
 
     get_wikitoc_locked:function()
     {
-        util.debug("db: getting is_wikitoc_locked" + is_wikitoc_locked);
-        return is_wikitoc_locked;
+        util.debug("db: getting is_wikitoc_locked" + this.is_wikitoc_locked);
+        return this.is_wikitoc_locked;
     },
     
     set_wikitoc_locked:function(payload)
@@ -129,24 +129,24 @@ var db =
             false otherwise (i.e. TOC is floating)
         */
 
-        is_wikitoc_locked = payload;
-        self.port.emit("is_wikitoc_locked", is_wikitoc_locked);
-        util.debug("db: setting is_wikitoc_locked" + is_wikitoc_locked);
+        this.is_wikitoc_locked = payload;
+        self.port.emit("is_wikitoc_locked", this.is_wikitoc_locked);
+        util.debug("db: setting is_wikitoc_locked" + this.is_wikitoc_locked);
     },
     
     get_wikitoc_margin_position:function()
     {
-        util.debug("db: getting wikitoc_margin_position" + wikitoc_margin_position);
-        return wikitoc_margin_position;
+        util.debug("db: getting wikitoc_margin_position" + this.wikitoc_margin_position);
+        return this.wikitoc_margin_position;
     },
     
     set_wikitoc_margin_position:function(payload)
     {
         //wikitoc_margin is the value of the margin of the TOC on LHS in pixels
         
-        wikitoc_margin_position = payload;
-        self.port.emit("wikitoc_margin_position", wikitoc_margin_position);
-        util.debug("db: setting wikitoc_margin_position" + wikitoc_margin_position);
+        this.wikitoc_margin_position = payload;
+        self.port.emit("wikitoc_margin_position", this.wikitoc_margin_position);
+        util.debug("db: setting wikitoc_margin_position" + this.wikitoc_margin_position);
     },
 };
 
@@ -194,7 +194,8 @@ var util =
 
 var wiki_toc=
 {
-    init:function(o)
+    o: {},
+    init:function()
     {
         // process TOC chapter listing
         // then save TOC CSS settings
@@ -203,16 +204,16 @@ var wiki_toc=
         // then run toc_toggle_left()
         // then adds the page_scroll event
         
-        o.events = {}; //stores hash of event handlers
+        this.o.events = {}; //stores hash of event handlers
         
         db.set_wikitoc_status(true);
 
         if (db.get_wikitoc_status() == true) 
         {
             util.debug("Initialising wiki_toc()...1");
-            this.init_save_positions(o);
+            this.init_save_positions();
             util.debug("Initialising wiki_toc()...2");
-            this.init_toc_chapter_listing(o);
+            this.init_toc_chapter_listing();
             util.debug("Initialising wiki_toc()...3");
             
             if (db.get_wikitoc_on_lhs() == null)
@@ -224,18 +225,14 @@ var wiki_toc=
             
             if (db.get_wikitoc_on_lhs() == true)
             {
-                this.toc_toggle_left(o);
+                this.toc_toggle_left();
             }
             util.debug("Initialising wiki_toc()...5");
-            this.init_html_buttons(o);
+            this.init_html_buttons();
             util.debug("Initialising wiki_toc()...6");
-            this.init_events(o);
+            this.init_events();
             util.debug("Initialising wiki_toc() is done!");
             util.debug("");
-            util.debug("is_wes_enabled           " + is_wes_enabled);
-            util.debug("is_wikitoc_on_lhs        " + is_wikitoc_on_lhs);
-            util.debug("is_wikitoc_locked        " + is_wikitoc_locked);
-            util.debug("wikitoc_margin_position  " + wikitoc_margin_position);
 
         } else {
             util.debug("wiki_toc() is not running");
@@ -243,44 +240,44 @@ var wiki_toc=
         
     },
     
-    init_events:function(o)
+    init_events:function()
     {
-        this.event_add(o, window,'scroll','event_page_scroll',o);
-        this.event_page_scroll(o);
+        this.event_add(window,'scroll','event_page_scroll',this.o);
+        this.event_page_scroll(this.o);
         
         var toctoggle = document.getElementById("toctoggle");
-        this.event_add(o, toctoggle,'click','toc_toggle',o);
+        this.event_add(toctoggle,'click','toc_toggle',this.o);
 
         var toc_lock = document.getElementById("toc_lock");
-        this.event_add(o, toc_lock,'click','set_state_on_and_locked',o);
+        this.event_add(toc_lock,'click','set_state_on_and_locked',this.o);
 
         var toc_unlock = document.getElementById("toc_unlock");
-        this.event_add(o, toc_unlock,'click','set_state_on_and_unlocked',o);
+        this.event_add(toc_unlock,'click','set_state_on_and_unlocked',this.o);
         
-        this.event_add(o, window,'scroll','event_toc_scroll_lock',o);
-        this.event_toc_scroll_lock(o);
+        this.event_add(window,'scroll','event_toc_scroll_lock',this.o);
+        this.event_toc_scroll_lock();
 
-        this.event_add(o, window,'resize','toc_toggle_left',o);
+        this.event_add(window,'resize','toc_toggle_left',this.o);
     },
     
-    init_save_positions:function(o)
+    init_save_positions:function()
     {
         //save original toc settings
-        o.toc_original = {};
-        o.toc_original["height"] = $("#toc").css("height");
-        o.toc_original["width"] = $("#toc").css("width");
-        o.toc_original["overflow"] = $("#toc").css("overflow");
-        o.toc_original["border"] = $("#toc").css("border");
-        o.toc_original["position"] = $("#toc").css("position");
-        o.toc_original["left"] = $("#toc").css("left");
-        o.toc_original["top"] = $("#toc").css("top");
+        this.o.toc_original = {};
+        this.o.toc_original["height"] = $("#toc").css("height");
+        this.o.toc_original["width"] = $("#toc").css("width");
+        this.o.toc_original["overflow"] = $("#toc").css("overflow");
+        this.o.toc_original["border"] = $("#toc").css("border");
+        this.o.toc_original["position"] = $("#toc").css("position");
+        this.o.toc_original["left"] = $("#toc").css("left");
+        this.o.toc_original["top"] = $("#toc").css("top");
         
         //save LHS frame settings
-        o.frame_left_navigation = $("#left-navigation").css('margin-left');
-        o.frame_content = $("#content").css('margin-left');
+        this.o.frame_left_navigation = $("#left-navigation").css('margin-left');
+        this.o.frame_content = $("#content").css('margin-left');
     },
 
-    init_html_buttons:function(o)
+    init_html_buttons:function()
     {
         /** add html control buttons to TOC
         */
@@ -320,7 +317,7 @@ var wiki_toc=
         toctitle.appendChild(toc_unlock);
     },
     
-    init_toc_chapter_listing:function(o)
+    init_toc_chapter_listing:function()
     {
         var div_list=document.getElementsByClassName('mw-headline');
         var content_listing = [];
@@ -351,7 +348,7 @@ var wiki_toc=
             //util.debug("adding: " + content_listing[i].outerHTML );
         }
         
-        o.chapters_listing = chapters_listing;
+        this.o.chapters_listing = chapters_listing;
         
         for (i=0; i<chapters_listing.length; i++)
         {
@@ -360,45 +357,46 @@ var wiki_toc=
         }
     },
     
-    toc_toggle:function(o)
+    toc_toggle:function()
     {
         util.debug("toc_toggle()");
         if (db.get_wikitoc_on_lhs() == true)
         {
             util.debug("going to move TOC to right");
-            this.toc_toggle_right(o);
+            this.toc_toggle_right();
             
         } else 
         {
             util.debug("going to move TOC to left");
-            this.toc_toggle_left(o);
+            this.toc_toggle_left();
         }
     },
 
-    set_state_on_and_unlocked:function(o)
+    set_state_on_and_unlocked:function()
     {
         /** activates lhstoc on the left hand panel, and let it float */
-        this.event_toc_unlock(o);
-        this.toc_toggle_left(o);
+        this.event_toc_unlock(this.o);
+        this.toc_toggle_left(this.o);
     },
 
-    set_state_on_and_locked:function(o)
+    set_state_on_and_locked:function()
     {
         /** activates lhstoc on the left hand panel, and set it locked, so it always appear on lhs*/
-        this.event_toc_lock(o);
-        this.toc_toggle_left(o);
+        this.event_toc_lock(this.o);
+        this.toc_toggle_left(this.o);
     },
 
-    set_state_off:function(o)
+    set_state_off:function()
     {
         /** deactivate lhstoc on the left hand panel*/
-        this.toc_toggle_right(o);
+        this.toc_toggle_right(this.o);
     },
         
-    toc_toggle_left:function(o)
+    toc_toggle_left:function()
     {
         /**toggle TOC to LHS
         */
+        util.debug("toc_toggle_left()");
         
         var toc_height = window.innerHeight.toString() + "px";
         //var toc_width = $("#content").offsetLeft + "px";
@@ -431,7 +429,7 @@ var wiki_toc=
             $('#lhs_toc').resizable({
               handles: "e",
               stop: function(e, ui){
-                  that.event_update_content_margin(o);
+                  that.event_update_content_margin();
                 },
             });
         }
@@ -444,26 +442,27 @@ var wiki_toc=
         db.set_wikitoc_on_lhs(true);
         
         //resize the main content section on RHS on fit the size of the TOC on LHS
-        this.event_update_content_margin(o);
-        this.event_toc_scroll_lock(o);
+        this.event_update_content_margin();
+        this.event_toc_scroll_lock();
     },
     
-    toc_toggle_right:function(o)
+    toc_toggle_right:function()
     {
         /* move TOC to LHS
         uses original toc values from o.toc_original dictionary.
         */
+        util.debug("|||||||toc_toggle_right()");
         
         $("#lhs_toc").resizable( "destroy" ); //remove scrolling and associated events
         $("#lhs_toc").remove();
         
-        $("#left-navigation").css('margin-left', o.frame_left_navigation);
-        $("#content").css('margin-left',  o.frame_content);
+        $("#left-navigation").css('margin-left', this.o.frame_left_navigation);
+        $("#content").css('margin-left', this.o.frame_content);
         db.set_wikitoc_on_lhs(false);
     },
     
     
-    event_update_content_margin:function(o)
+    event_update_content_margin:function()
     {
         /** based on the width of lhs_toc, update the position of the main CONTENTS margin to follow that of the lhs_toc */
         
@@ -476,21 +475,21 @@ var wiki_toc=
         }
     },
 
-    event_toc_lock:function(o)
+    event_toc_lock:function()
     {
         /** event that locks the lhs_toc to always appear on the LHS */
         db.set_wikitoc_locked(true);
-        this.event_toc_scroll_lock(o); //refresh the toc
+        this.event_toc_scroll_lock(); //refresh the toc
     },
 
-    event_toc_unlock:function(o)
+    event_toc_unlock:function()
     {
         /** event that sets the lhs_toc to only appear if the user scrolls past the lhs language options */
         db.set_wikitoc_locked(false);
-        this.event_toc_scroll_lock(o); //refresh the toc
+        this.event_toc_scroll_lock(); //refresh the toc
     },
                               
-    event_toc_scroll_lock:function(o)
+    event_toc_scroll_lock:function()
     {
         /** event that lock position of lhs toc if user scrolls below the lhs panel */
 
@@ -522,29 +521,29 @@ var wiki_toc=
         }
     },
     
-    event_page_scroll:function(o)
+    event_page_scroll:function()
     {
         /** event that gets called when user scrolls.
             Hightlights current chapter in the TOC
         */
         
         var nu = 0;
-        for (nu=0,i=0; i<o.chapters_listing.length; i++){
-            o.chapters_listing[i][1].className=o.chapters_listing[i][2];
-            //(this.pos(o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/2)<0?nu=i:null;
-            (this.pos(o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/100)<0?nu=i:null;
+        for (nu=0,i=0; i < this.o.chapters_listing.length; i++){
+            this.o.chapters_listing[i][1].className=this.o.chapters_listing[i][2];
+            //(this.pos(this.o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/2)<0?nu=i:null;
+            (this.pos(this.o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/100)<0?nu=i:null;
             
         }
         if (nu !== null) {
-            //util.debug("hit paydirt: chapter is " + o.chapters_listing[nu][0].outerHTML);
-            o.chapters_listing[nu][1].className=o.chapters_listing[nu][3];
+            //util.debug("hit paydirt: chapter is " + this.o.chapters_listing[nu][0].outerHTML);
+            this.o.chapters_listing[nu][1].className=this.o.chapters_listing[nu][3];
             
-            var current_section = o.chapters_listing[nu][0].getAttribute("id");
-            this.update_toc(o, current_section);
+            var current_section = this.o.chapters_listing[nu][0].getAttribute("id");
+            this.update_toc(this.o, current_section);
         }
     },
     
-    update_toc:function(o, current_section)
+    update_toc:function(current_section)
     {
         /**given the name of the current_section, update the toc (table of contents) to highlight this section, and also unhighlight any other highlighted sections
         */
@@ -605,7 +604,7 @@ var wiki_toc=
     },
     
     
-    event_add:function(o, event_object, event_name, function_name,p)
+    event_add:function(event_object, event_name, function_name,p)
     {
         /*
             Docs for EventTarget.addEventListener:
@@ -615,15 +614,15 @@ var wiki_toc=
         var oop=this;
         var event_handler;
         if (event_object.addEventListener){
-            o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e);};
-            event_handler = o.events[event_object + event_name + function_name];
+            this.o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e);};
+            event_handler = this.o.events[event_object + event_name + function_name];
 
             event_object.addEventListener(event_name, event_handler, false);
             util.debug("EVENT: adding event listener:" + event_name + " function_name:" + function_name + " p:" + p);
         }
         else if (event_object.attachEvent){
-            o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e); };
-            event_handler = o.events[event_object + event_name + function_name];
+            this.o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e); };
+            event_handler = this.o.events[event_object + event_name + function_name];
 
             event_object.attachEvent('on'+event_name, event_handler);
             util.debug("EVENT: adding attach event :" + event_name + " function_name:" + function_name + " p:" + p);
@@ -632,9 +631,9 @@ var wiki_toc=
             util.debug("EVENT: unable to add event :" + event_name + " function_name:" + function_name + " p:" + p);
         }
     },
-    event_remove:function (o, event_object,event_name, function_name) 
+    event_remove:function (event_object,event_name, function_name) 
     {
-        var event_handler = o.events[event_object + event_name + function_name];
+        var event_handler = this.o.events[event_object + event_name + function_name];
         util.debug("event_remove() what is event_handler:" + event_handler);
         if (event_object.removeEventListener)  
         {
@@ -665,45 +664,45 @@ var wiki_toc=
     },
 };
 
+db.init();
 self.port.on("refresh_wes", function(json_string) {
 	var json_obj = JSON.parse(json_string);
 
 	util.debug("refresh_wes(): refreshingggggg!!!");
-	util.debug("refresh_wes(): " +  db.get_wikitoc_status() );
-	util.debug("refresh_wes(): " +  db.get_wikitoc_on_lhs() );
-	util.debug("refresh_wes(): " +  db.get_wikitoc_locked() );
-	util.debug("refresh_wes(): " +  db.get_wikitoc_margin_position() );
+	util.debug("refresh_wes(): " + json_string);
+	util.debug("refresh_wes(): wikitoc on lhs?" + json_obj.is_wikitoc_on_lhs);
+	util.debug("refresh_wes(): wikitoc locked?" + json_obj.is_wikitoc_locked);
 
-	if (db.get_wikitoc_on_lhs() == true && db.get_wikitoc_locked() == true)
+	if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == true)
 	{
-		wiki_toc.toc_toggle_left(o);
+		wiki_toc.toc_toggle_left();
 		wiki_toc.set_state_on_and_locked();
-		wiki_toc.event_toc_scroll_lock()
+		wiki_toc.event_toc_scroll_lock();
 		util.debug("refresh_wes(): lets set wikitoc on LHS and locked");
 		util.debug("refresh_wes(): lets update toc scroll lock");
 	}
-	else if (db.get_wikitoc_on_lhs() == true && db.get_wikitoc_locked() == false)
+    else if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == false)
 	{
-		wiki_toc.toc_toggle_left(o);
+		wiki_toc.toc_toggle_left();
 		wiki_toc.set_state_on_and_unlocked();
 		util.debug("refresh_wes(): lets set wikitoc on LHS and unlocked");
 		util.debug("refresh_wes(): lets update toc scroll lock");
 	}
-	else if (db.get_wikitoc_on_lhs() == false)
+    else if (json_obj.is_wikitoc_on_lhs == false)
 	{
+		wiki_toc.set_state_off();
 		util.debug("refresh_wes(): lets toggle right");
-		wiki_toc.toc_toggle_right(o);
 	}
 	else 
 	{
 		util.debug("refresh_wes(): lets do nothing");
 	}
 
+    db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
 	wiki_toc.event_update_content_margin();
 	util.debug("refresh_wes(): lets update content margin");
 });
 
-var o = {};
 
 self.port.on("init_wes", function(json_string) {
     if ($("#toc").length == 0 ||  
@@ -720,9 +719,8 @@ self.port.on("init_wes", function(json_string) {
         db.set_wikitoc_locked(json_obj.is_wikitoc_locked);
         db.set_wikitoc_on_lhs(json_obj.is_wikitoc_on_lhs);
         db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
-        db.init()
 
-        setTimeout( function() { wiki_toc.init(o) }, 50);
+        setTimeout( function() { wiki_toc.init() }, 50);
 
     }
 });

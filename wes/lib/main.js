@@ -185,11 +185,13 @@ tabs.on('activate', function () {
 		var json_obj = 
 		{
 			"is_wes_enabled": localStorage.getItem("is_wes_enabled"),
-			"is_wikitoc_locked": localStorage.getItem("is_wikitoc_locked"),
-			"is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
+			"is_wikitoc_on_lhs": button_activated.checked,
+			"is_wikitoc_locked": button_locked.checked,
 			"wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
 		};
 		var json_string = JSON.stringify(json_obj);
+		console.log('active: ' + json_string);
+        worker = getActiveWorker();
 		worker.port.emit("refresh_wes", json_string);
 	}
 });
@@ -234,9 +236,11 @@ pageMod.PageMod({
         localStorage.setItem("is_wikitoc_on_lhs", payload);
         if (payload == true) {
             button_activated.state(button_activated, lhswikitoc_activated);
+            button_activated.checked = true;
         }
         else {
             button_activated.state(button_activated, lhswikitoc_deactivated);
+            button_activated.checked = false;
         }
     });
     worker.port.on("is_wikitoc_locked", function(payload) {
@@ -244,9 +248,11 @@ pageMod.PageMod({
         localStorage.setItem("is_wikitoc_locked", payload);
         if (payload == true) {
             button_locked.state(button_locked, wes_locked);
+            button_locked.checked = true;
         }
         else {
             button_locked.state(button_locked, wes_unlocked);
+            button_locked.checked = false;
         }
     });
     worker.port.on("wikitoc_margin_position", function(payload) {
