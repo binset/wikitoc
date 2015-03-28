@@ -11,13 +11,13 @@ let pageWorkers = require("sdk/page-worker");
 
 let localStorage = ss.storage;
 localStorage.getItem = function(key) {
-	return ss.storage[key];
+    return ss.storage[key];
 };
 localStorage.setItem = function(key, value) {
-	ss.storage[key] = value;
+    ss.storage[key] = value;
 };
 localStorage.removeItem = function(key) {
-	delete ss.storage[key];
+    delete ss.storage[key];
 };
 
 let workers = [];
@@ -31,10 +31,10 @@ function getActiveWorker() {
     return null;
 }
 function detachWorker(worker, workerArray) {
-	let index = workerArray.indexOf(worker);
-	if (index !== -1) {
-		workerArray.splice(index, 1);
-	}
+    let index = workerArray.indexOf(worker);
+    if (index !== -1) {
+        workerArray.splice(index, 1);
+    }
 }
 
 
@@ -83,9 +83,9 @@ function handle_activate_click(state) {
         worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
         worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
     } else
-	{
+    {
         console.log("main.js: I can't find your worker mate");
-	}
+    }
 
 }
 
@@ -114,26 +114,17 @@ function handle_lock_click(state) {
         worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
         worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
     } else
-	{
+    {
         console.log("main.js: I can't find your worker mate");
-	}
+    }
 }
 
 function init() {
     {
         //is_wes_enabled
-        let is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
+        let is_wikitoc_on_lhs = localStorage.getItem("is_wes_enabled");
         if (is_wikitoc_on_lhs == undefined || is_wikitoc_on_lhs == null) {
-            localStorage.setItem("is_wikitoc_on_lhs", true);
-        }
-
-        is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
-        if (is_wikitoc_on_lhs == true) {
-            button_activated.checked = true;
-            button_activated.state(button_activated, lhswikitoc_activated);
-        } else {
-            button_activated.checked = false;
-            button_activated.state(button_activated, lhswikitoc_deactivated);
+            localStorage.setItem("is_wes_enabled", true);
         }
     }
 
@@ -147,10 +138,10 @@ function init() {
         is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
         if (is_wikitoc_on_lhs == true) {
             button_activated.checked = true;
-            button_activated.state(button_activated, wes_locked);
+            button_activated.state(button_activated, lhswikitoc_activated);
         } else {
             button_activated.checked = false;
-            button_activated.state(button_activated, wes_unlocked);
+            button_activated.state(button_activated, lhswikitoc_deactivated);
         }
     }
 
@@ -179,87 +170,91 @@ tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
 tabs.open("https://en.wikipedia.org/wiki/Telstra");
 
 tabs.on('activate', function () {
-	if (/wikipedia/.test(tabs.activeTab.url))
-	{
-		console.log('active: ' + tabs.activeTab.url);
-		var json_obj = 
-		{
-			"is_wes_enabled": localStorage.getItem("is_wes_enabled"),
-			"is_wikitoc_on_lhs": button_activated.checked,
-			"is_wikitoc_locked": button_locked.checked,
-			"wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
-		};
-		var json_string = JSON.stringify(json_obj);
-		console.log('active: ' + json_string);
+    if (/wikipedia/.test(tabs.activeTab.url))
+    {
+        console.log('active: ' + tabs.activeTab.url);
+        var json_obj = 
+        {
+            "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
+            "is_wikitoc_on_lhs": button_activated.checked,
+            "is_wikitoc_locked": button_locked.checked,
+            "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
+        };
+        var json_string = JSON.stringify(json_obj);
+        console.log('active: ' + json_string);
         worker = getActiveWorker();
-		worker.port.emit("refresh_wes", json_string);
-	}
+        if (worker)
+        {
+            worker.port.emit("refresh_wes", json_string);
+        } else
+        {
+            console.log("main.js: I can't find your worker mate");
+        }
+    }
 });
  
 // Create a page mod
 // It will run a script whenever a ".org" URL is loaded
 // The script replaces the page contents with a message
 pageMod.PageMod({
-  include: "*",
-	contentScriptWhen: "ready",
-  contentScriptFile: [
-    self.data.url("vendor/jquery/1.7.2/jquery.min.js"),
-    self.data.url("vendor/jqueryui/1.8/jquery-ui.min.js"),
-    self.data.url("wes.js"),
-  ],
-  contentStyleFile: [
-    self.data.url("vendor/jqueryui/1.8/themes/base/jquery-ui.css"),
-  ],
-  onAttach: function(worker) {
-    workers.push(worker);
-    worker.on('detach', function () {
-        detachWorker(this, workers);
-    });
+    include: "*",
+    contentScriptWhen: "ready",
+    contentScriptFile: [
+        self.data.url("vendor/jquery/1.7.2/jquery.min.js"),
+        self.data.url("vendor/jqueryui/1.8/jquery-ui.min.js"),
+        self.data.url("wes.js"),
+    ],
+    contentStyleFile: [
+        self.data.url("vendor/jqueryui/1.8/themes/base/jquery-ui.css"),
+    ],
+    onAttach: function(worker) {
+        workers.push(worker);
+        worker.on('detach', function () {
+            detachWorker(this, workers);
+        });
 
-    var json_obj = 
-    {
-        "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
-        "is_wikitoc_locked": localStorage.getItem("is_wikitoc_locked"),
-        "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
-        "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
-    };
-    var json_string = JSON.stringify(json_obj);
+        var json_obj = 
+        {
+            "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
+            "is_wikitoc_locked": localStorage.getItem("is_wikitoc_locked"),
+            "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
+            "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
+        };
+        var json_string = JSON.stringify(json_obj);
 
-    worker.port.emit("init_wes", json_string);
+        worker.port.emit("init_wes", json_string);
 
-    worker.port.on("is_wes_enabled", function(payload) {
-        console.log("main.js: setting is wikitoc_enabled:" + payload);
-        localStorage.setItem("is_wes_enabled", payload);
-    });
-    worker.port.on("is_wikitoc_on_lhs", function(payload) {
-        console.log("main.js: setting is_wikitoc_on_lhs:" + payload);
-        localStorage.setItem("is_wikitoc_on_lhs", payload);
-        if (payload == true) {
-            button_activated.state(button_activated, lhswikitoc_activated);
-            button_activated.checked = true;
-        }
-        else {
-            button_activated.state(button_activated, lhswikitoc_deactivated);
-            button_activated.checked = false;
-        }
-    });
-    worker.port.on("is_wikitoc_locked", function(payload) {
-        console.log("main.js: setting is_wikitoc_locked:" + payload);
-        localStorage.setItem("is_wikitoc_locked", payload);
-        if (payload == true) {
-            button_locked.state(button_locked, wes_locked);
-            button_locked.checked = true;
-        }
-        else {
-            button_locked.state(button_locked, wes_unlocked);
-            button_locked.checked = false;
-        }
-    });
-    worker.port.on("wikitoc_margin_position", function(payload) {
-        console.log("main.js: setting wikitoc_margin_position:" + payload);
-        localStorage.setItem("wikitoc_margin_position", payload);
-    });
-  }
+        worker.port.on("is_wes_enabled", function(payload) {
+            console.log("main.js: setting is wikitoc_enabled:" + payload);
+            localStorage.setItem("is_wes_enabled", payload);
+        });
+        worker.port.on("is_wikitoc_on_lhs", function(payload) {
+            console.log("main.js: setting is_wikitoc_on_lhs:" + payload);
+            localStorage.setItem("is_wikitoc_on_lhs", payload);
+            if (payload == true) {
+                button_activated.state(button_activated, lhswikitoc_activated);
+                button_activated.checked = true;
+            }
+            else {
+                button_activated.state(button_activated, lhswikitoc_deactivated);
+                button_activated.checked = false;
+            }
+        });
+        worker.port.on("is_wikitoc_locked", function(payload) {
+            console.log("main.js: setting is_wikitoc_locked:" + payload);
+            localStorage.setItem("is_wikitoc_locked", payload);
+            if (payload == true) {
+                button_locked.state(button_locked, wes_locked);
+                button_locked.checked = true;
+            }
+            else {
+                button_locked.state(button_locked, wes_unlocked);
+                button_locked.checked = false;
+            }
+        });
+        worker.port.on("wikitoc_margin_position", function(payload) {
+            console.log("main.js: setting wikitoc_margin_position:" + payload);
+            localStorage.setItem("wikitoc_margin_position", payload);
+        });
+    }
 });
-
-

@@ -666,41 +666,41 @@ var wiki_toc=
 
 db.init();
 self.port.on("refresh_wes", function(json_string) {
-	var json_obj = JSON.parse(json_string);
+    var json_obj = JSON.parse(json_string);
 
-	util.debug("refresh_wes(): refreshingggggg!!!");
-	util.debug("refresh_wes(): " + json_string);
-	util.debug("refresh_wes(): wikitoc on lhs?" + json_obj.is_wikitoc_on_lhs);
-	util.debug("refresh_wes(): wikitoc locked?" + json_obj.is_wikitoc_locked);
+    util.debug("refresh_wes(): refreshingggggg!!!");
+    util.debug("refresh_wes(): " + json_string);
+    util.debug("refresh_wes(): wikitoc on lhs?" + json_obj.is_wikitoc_on_lhs);
+    util.debug("refresh_wes(): wikitoc locked?" + json_obj.is_wikitoc_locked);
 
-	if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == true)
-	{
-		wiki_toc.toc_toggle_left();
-		wiki_toc.set_state_on_and_locked();
-		wiki_toc.event_toc_scroll_lock();
-		util.debug("refresh_wes(): lets set wikitoc on LHS and locked");
-		util.debug("refresh_wes(): lets update toc scroll lock");
-	}
+    if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == true)
+    {
+        wiki_toc.toc_toggle_left();
+        wiki_toc.set_state_on_and_locked();
+        wiki_toc.event_toc_scroll_lock();
+        util.debug("refresh_wes(): lets set wikitoc on LHS and locked");
+        util.debug("refresh_wes(): lets update toc scroll lock");
+    }
     else if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == false)
-	{
-		wiki_toc.toc_toggle_left();
-		wiki_toc.set_state_on_and_unlocked();
-		util.debug("refresh_wes(): lets set wikitoc on LHS and unlocked");
-		util.debug("refresh_wes(): lets update toc scroll lock");
-	}
+    {
+        wiki_toc.toc_toggle_left();
+        wiki_toc.set_state_on_and_unlocked();
+        util.debug("refresh_wes(): lets set wikitoc on LHS and unlocked");
+        util.debug("refresh_wes(): lets update toc scroll lock");
+    }
     else if (json_obj.is_wikitoc_on_lhs == false)
-	{
-		wiki_toc.set_state_off();
-		util.debug("refresh_wes(): lets toggle right");
-	}
-	else 
-	{
-		util.debug("refresh_wes(): lets do nothing");
-	}
+    {
+        wiki_toc.set_state_off();
+        util.debug("refresh_wes(): lets toggle right");
+    }
+    else 
+    {
+        util.debug("refresh_wes(): lets do nothing");
+    }
 
     db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
-	wiki_toc.event_update_content_margin();
-	util.debug("refresh_wes(): lets update content margin");
+    wiki_toc.event_update_content_margin();
+    util.debug("refresh_wes(): lets update content margin");
 });
 
 
