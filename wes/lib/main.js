@@ -8,6 +8,7 @@ let buttons = require("sdk/ui/button/toggle");
 let tabs = require("sdk/tabs");
 let pageWorkers = require("sdk/page-worker");
 //let workers = require("sdk/content/worker");
+var panels = require("sdk/panel");
 
 let localStorage = ss.storage;
 localStorage.getItem = function(key) {
@@ -258,3 +259,30 @@ pageMod.PageMod({
         });
     }
 });
+
+
+
+var button_ui = buttons.ToggleButton({
+    id: "button_ui",
+    label: "wikitoc",
+    icon: "./browser_on.png",
+    onChange: handleChange
+});
+
+var panel = panels.Panel({
+    contentURL: self.data.url("ui/panel.html"),
+    onHide: handleHide,
+    onReady: function() {
+        this.port.emit("init", 'wee');
+    }
+});
+
+function handleChange(state) {
+    if (state.checked) {
+        panel.show({ position: button_ui });
+    }
+};
+
+function handleHide() {
+  button_ui.state('window', {checked: false});
+};
