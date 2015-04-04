@@ -668,6 +668,11 @@ db.init();
 self.port.on("refresh_wes", function(json_string) {
     var json_obj = JSON.parse(json_string);
 
+    db.is_wes_enabled = json_obj.is_wes_enabled;
+    db.is_wikitoc_on_lhs = json_obj.is_wikitoc_on_lhs;
+    db.is_wikitoc_locked = json_obj.is_wikitoc_locked;
+    db.wikitoc_margin_position = json_obj.wikitoc_margin_position; 
+
     util.debug("refresh_wes(): refreshingggggg!!!");
     util.debug("refresh_wes(): " + json_string);
     util.debug("refresh_wes(): wikitoc on lhs?" + json_obj.is_wikitoc_on_lhs);
@@ -700,7 +705,7 @@ self.port.on("refresh_wes", function(json_string) {
 
     db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
     wiki_toc.event_update_content_margin();
-    util.debug("refresh_wes(): lets update content margin");
+    util.debug("refresh_wes():_lets update content margin: " + json_obj.wikitoc_margin_position);
 });
 
 

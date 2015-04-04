@@ -271,18 +271,27 @@ var button_ui = buttons.ToggleButton({
 
 var panel = panels.Panel({
     contentURL: self.data.url("ui/panel.html"),
+    contentScriptFile: self.data.url("ui/repl-panel.js"),
     onHide: handleHide,
     onReady: function() {
-        this.port.emit("init", 'wee');
+        console.log('panel is ready!');
+        //this.postMessage("init", "blah blah");
+        //this.port.emit("init", 'wee');
     }
 });
 
 function handleChange(state) {
     if (state.checked) {
         panel.show({ position: button_ui });
+        payload = {};
+        payload.is_wes_enabled =          localStorage.getItem("is_wes_enabled");
+        payload.is_wikitoc_locked =       localStorage.getItem("is_wikitoc_locked");
+        payload.is_wikitoc_on_lhs =       localStorage.getItem("is_wikitoc_on_lhs");
+        payload.wikitoc_margin_position = localStorage.getItem("wikitoc_margin_position");
+        panel.port.emit("panelclick", payload);
     }
 };
 
 function handleHide() {
-  button_ui.state('window', {checked: false});
+    button_ui.state('window', {checked: false});
 };
