@@ -154,7 +154,7 @@ var util =
 {
     debug:function(debug_string)
     {
-        var debugging = true;
+        var debugging = false;
         if (debugging)
         {
             console.log("DEBUG: " + debug_string);

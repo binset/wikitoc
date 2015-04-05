@@ -265,7 +265,7 @@ pageMod.PageMod({
 var button_ui = buttons.ToggleButton({
     id: "button_ui",
     label: "wikitoc",
-    icon: "./browser_on.png",
+    icon: "./w_blue.png",
     onChange: handleChange
 });
 
@@ -295,3 +295,55 @@ function handleChange(state) {
 function handleHide() {
     button_ui.state('window', {checked: false});
 };
+
+panel.port.on("is_wes_enabled", function(payload) {
+    console.log("main.js: setting is wikitoc_enabled:" + payload);
+    localStorage.setItem("is_wes_enabled", payload);
+    update_wes();
+});
+panel.port.on("is_wikitoc_on_lhs", function(payload) {
+    console.log("main.js: setting is_wikitoc_on_lhs:" + payload);
+    localStorage.setItem("is_wikitoc_on_lhs", payload);
+    update_wes();
+    if (payload == true) {
+        button_activated.state(button_activated, lhswikitoc_activated);
+        button_activated.checked = true;
+    }
+    else {
+        button_activated.state(button_activated, lhswikitoc_deactivated);
+        button_activated.checked = false;
+    }
+});
+panel.port.on("is_wikitoc_locked", function(payload) {
+    console.log("main.js: setting is_wikitoc_locked:" + payload);
+    localStorage.setItem("is_wikitoc_locked", payload);
+    update_wes();
+    if (payload == true) {
+        button_locked.state(button_locked, wes_locked);
+        button_locked.checked = true;
+    }
+    else {
+        button_locked.state(button_locked, wes_unlocked);
+        button_locked.checked = false;
+    }
+});
+panel.port.on("wikitoc_margin_position", function(payload) {
+    console.log("main.js: setting wikitoc_margin_position:" + payload);
+    localStorage.setItem("wikitoc_margin_position", payload);
+    update_wes();
+});
+
+function update_wes(){
+    worker = getActiveWorker();
+    if (worker)
+    {
+        console.log("main.js: update_wes()");
+        worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
+        worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
+        worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
+    } else
+    {
+        console.log("main.js: I can't find your worker mate");
+    }
+}
+
