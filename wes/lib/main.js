@@ -167,8 +167,8 @@ function init() {
 
 init()
 
-tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
-tabs.open("https://en.wikipedia.org/wiki/Telstra");
+//tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
+//tabs.open("https://en.wikipedia.org/wiki/Telstra");
 
 tabs.on('activate', function () {
     if (/wikipedia/.test(tabs.activeTab.url))

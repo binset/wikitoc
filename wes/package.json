@@ -3,11 +3,11 @@
   "title": "wiki_enhancement_suite",
   "id": "jid1-cMSHi7uqCHRhsQ",
   "description": "Enhances the Table of Contents on wikimedia sites including Wikipedia",
-  "author": "",
+  "author": "teamrc",
   "license": "MPL 2.0",
-  "version": "0.1a",
-  "homepage": "google.com/",
+  "version": "0.9",
+  "homepage": "https://addons.mozilla.org/en-US/firefox/addon/wiki_enhancement_suite/",
   "readmeFilename": "README.md",
-  "icon": "data/browser_on.png",
-  "icon64": "data/browser_on.png"
+  "icon": "data/w_blue.png",
+  "icon64": "data/w_blue.png"
 }
