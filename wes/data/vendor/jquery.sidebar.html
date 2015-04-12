@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="jquery.sidebar.css" rel="stylesheet">
+    <script src="jquery/1.7.2/jquery.min.js"></script>
+    <script src="jquery.sidebar.js"></script>
+
+</head>
+<body>
+
+<a href="#" class="btn btn-primary" data-action="toggle" ><span>Toggle Right</span></a>
+
+
+<div id="lhs_toc" class="toc sidebar right">
+<div id="toctitle">
+<h2>Contents</h2>
+</div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="#Related_terms"><span class="tocnumber">1</span> <span class="toctext">Related terms</span></a></li>
+<li class="toclevel-1 tocsection-2"><a href="#Marxian_economic_analysis"><span class="tocnumber">2</span> <span class="toctext">Marxian economic analysis</span></a></li>
+<li class="toclevel-1 tocsection-3"><a href="#See_also"><span class="tocnumber">3</span> <span class="toctext">See also</span></a></li>
+<li class="toclevel-1 tocsection-4"><a href="#Footnotes"><span class="tocnumber">4</span> <span class="toctext">Footnotes</span></a></li>
+<li class="toclevel-1 tocsection-5"><a href="#References"><span class="tocnumber">5</span> <span class="toctext">References</span></a></li>
+</ul>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+    
+
+    
+	$("#lhs_toc").sidebar({"side": "right"})
+	//$("#lhs_toc").trigger("sidebar:open");
+	
+    // Click handlers
+    $(".btn[data-action]").on("click", function () {
+        var $this = $(this);
+        var action = $this.attr("data-action");
+        $("#lhs_toc").trigger("sidebar:" + action);
+        return false;
+    });
+});
+
+</script>
+
+
+</div>
+</body>
+</html>

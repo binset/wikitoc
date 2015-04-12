@@ -5,8 +5,6 @@
 // @homepage    http://teamrc.github.io/wikitoc/
 // @license     GNU GPL version 3.0
 // @description Table of Contents Enhancer for Wikipedia
-// @require     http://code.jquery.com/jquery-1.3.2.min.js
-// @include     *wiki*
 // @require     http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @require     http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js
 // @resource    jqUI_CSS  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css
@@ -157,7 +155,7 @@ var util =
         var debugging = false;
         if (debugging)
         {
-            console.log("DEBUG: " + debug_string);
+            console.log("_________DEBUG: " + debug_string);
         }
     },
 
@@ -310,6 +308,12 @@ var wiki_toc=
         toc_unlock.setAttribute("id", "toc_unlock");
         toc_unlock.setAttribute("title", "Click here to unlock the LHS TOC");
         toc_unlock.appendChild(document.createTextNode("  | unlock toc")); 
+
+        var btn_demo = document.createElement('a');
+        btn_demo.setAttribute("id", "btn_demo");
+        btn_demo.setAttribute("title", "Click here to unlock the LHS TOC");
+        btn_demo.appendChild(document.createTextNode("  | btn_demo  | ")); 
+        toctitle.appendChild(btn_demo);
 
         //Now add all the created elements into the HTML document
         toctitle.appendChild(toctoggle);
@@ -528,6 +532,7 @@ var wiki_toc=
         */
         
         var nu = 0;
+        var i = 0;
         for (nu=0,i=0; i < this.o.chapters_listing.length; i++){
             this.o.chapters_listing[i][1].className=this.o.chapters_listing[i][2];
             //(this.pos(this.o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/2)<0?nu=i:null;
@@ -726,6 +731,24 @@ self.port.on("init_wes", function(json_string) {
         db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
 
         setTimeout( function() { wiki_toc.init() }, 50);
+    }
+    
+    {
+        var cloned_toc = $("#toc").clone().attr('id', 'rhs_toc');
+        cloned_toc.find('#toctitle').attr('id', 'rhs_toctitle');
+        cloned_toc.insertAfter("#p-lang");
+        $("#rhs_toc").removeClass("toc");
+        $("#rhs_toc").addClass("sidebar left");
+        $("#rhs_toc").sidebar({side: "left"});
 
+        var toc_lock = null;
+        //jtoc_lock.addEventListener("click", function(){ alert("yeah"); $("rhs_toc").trigger("sidebar:toggle");alert("yeah"); } );
+        setTimeout( function() 
+                {
+        toc_lock = $("#btn_demo")[0];
+        console.log(toc_lock);
+        //toc_lock.addEventListener("click", function(){ alert("yeah"); } );
+        toc_lock.addEventListener("click", function(){ console.log("button demo"); $("#rhs_toc").trigger("sidebar:toggle");console.log("button demo"); } );
+                }, 100);
     }
 });

@@ -167,8 +167,7 @@ function init() {
 
 init()
 
-//tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
-//tabs.open("https://en.wikipedia.org/wiki/Telstra");
+tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
 
 tabs.on('activate', function () {
     if (/wikipedia/.test(tabs.activeTab.url))
@@ -203,10 +202,12 @@ pageMod.PageMod({
     contentScriptFile: [
         self.data.url("vendor/jquery/1.7.2/jquery.min.js"),
         self.data.url("vendor/jqueryui/1.8/jquery-ui.min.js"),
+        self.data.url("vendor/jquery.sidebar.js"),
         self.data.url("wes.js"),
     ],
     contentStyleFile: [
         self.data.url("vendor/jqueryui/1.8/themes/base/jquery-ui.css"),
+        self.data.url("vendor/jquery.sidebar.css"),
     ],
     onAttach: function(worker) {
         workers.push(worker);
