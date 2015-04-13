@@ -39,7 +39,6 @@ var db =
 
     is_wes_enabled: null,
     is_wikitoc_on_lhs: null,
-    is_wikitoc_locked: null,
     wikitoc_margin_position: null,
 
     init:function()
@@ -70,16 +69,6 @@ var db =
             wiki_toc.event_update_content_margin();
 
             util.debug("db: porttttttttt setting is_wikitoc_on_lhs:" + payload);
-        });
-
-        self.port.on("is_wikitoc_locked", function(payload) {
-            if (payload == true)
-                db.set_wikitoc_locked(true);
-            else 
-                db.set_wikitoc_locked(false);
-
-            wiki_toc.event_toc_scroll_lock();
-            util.debug("db: porttttttttt setting is_wikitoc_locked:" + payload);
         });
 
         self.port.on("wikitoc_margin_position", function(payload) {
@@ -114,24 +103,6 @@ var db =
         util.debug("db: setting is_wikitoc_on_lhs:" + this.is_wikitoc_on_lhs);
     },
 
-
-    get_wikitoc_locked:function()
-    {
-        util.debug("db: getting is_wikitoc_locked" + this.is_wikitoc_locked);
-        return this.is_wikitoc_locked;
-    },
-    
-    set_wikitoc_locked:function(payload)
-    {
-        /** set true if user specifies wikitoc to be locked and always appearing on the LHS
-            false otherwise (i.e. TOC is floating)
-        */
-
-        this.is_wikitoc_locked = payload;
-        self.port.emit("is_wikitoc_locked", this.is_wikitoc_locked);
-        util.debug("db: setting is_wikitoc_locked" + this.is_wikitoc_locked);
-    },
-    
     get_wikitoc_margin_position:function()
     {
         util.debug("db: getting wikitoc_margin_position" + this.wikitoc_margin_position);
@@ -208,6 +179,26 @@ var wiki_toc=
 
         if (db.get_wikitoc_status() == true) 
         {
+            if ($("#lhs_toc").length == 0)
+            {
+                //lhs_toc doesn't exist, we can recreate it
+
+                var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
+                cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
+                cloned_toc.insertAfter("#p-lang");
+
+                var that = this;
+                $('#lhs_toc').resizable({
+                  handles: "e",
+                  stop: function(e, ui){
+                      that.event_update_content_margin();
+                    },
+                });
+                $("#lhs_toc").removeClass("toc");
+                $("#lhs_toc").addClass("sidebar left");
+                $("#lhs_toc").sidebar({side: "left"});
+            }
+
             util.debug("Initialising wiki_toc()...1");
             this.init_save_positions();
             util.debug("Initialising wiki_toc()...2");
@@ -223,7 +214,7 @@ var wiki_toc=
             
             if (db.get_wikitoc_on_lhs() == true)
             {
-                this.toc_toggle_left();
+                    this.toc_toggle_left();
             }
             util.debug("Initialising wiki_toc()...5");
             this.init_html_buttons();
@@ -246,14 +237,11 @@ var wiki_toc=
         var toctoggle = document.getElementById("toctoggle");
         this.event_add(toctoggle,'click','toc_toggle',this.o);
 
-        var toc_lock = document.getElementById("toc_lock");
-        this.event_add(toc_lock,'click','set_state_on_and_locked',this.o);
-
-        var toc_unlock = document.getElementById("toc_unlock");
-        this.event_add(toc_unlock,'click','set_state_on_and_unlocked',this.o);
+        var toc_enable = document.getElementById("toc_enable");
+        this.event_add(toc_enable,'click','set_state_on',this.o);
         
-        this.event_add(window,'scroll','event_toc_scroll_lock',this.o);
-        this.event_toc_scroll_lock();
+        var toc_disable = document.getElementById("toc_disable");
+        this.event_add(toc_disable,'click','set_state_off',this.o);
 
         this.event_add(window,'resize','toc_toggle_left',this.o);
     },
@@ -299,26 +287,21 @@ var wiki_toc=
         toctoggle_img.setAttribute("alt", "toggle_toc");
         toctoggle.appendChild(toctoggle_img);
         
-        var toc_lock = document.createElement('a');
-        toc_lock.setAttribute("id", "toc_lock");
-        toc_lock.setAttribute("title", "Click here to lock the LHS TOC");
-        toc_lock.appendChild(document.createTextNode("  | lock toc")); 
+        var toc_enable = document.createElement('a');
+        toc_enable.setAttribute("id", "toc_enable");
+        toc_enable.setAttribute("title", "Click here to activate the LHS TOC");
+        toc_enable.appendChild(document.createTextNode("  | active toc")); 
 
-        var toc_unlock = document.createElement('a');
-        toc_unlock.setAttribute("id", "toc_unlock");
-        toc_unlock.setAttribute("title", "Click here to unlock the LHS TOC");
-        toc_unlock.appendChild(document.createTextNode("  | unlock toc")); 
+        var toc_disable = document.createElement('a');
+        toc_disable.setAttribute("id", "toc_disable");
+        toc_disable.setAttribute("title", "Click here to unactivate the LHS TOC");
+        toc_disable.appendChild(document.createTextNode("  | unactive toc")); 
 
-        var btn_demo = document.createElement('a');
-        btn_demo.setAttribute("id", "btn_demo");
-        btn_demo.setAttribute("title", "Click here to unlock the LHS TOC");
-        btn_demo.appendChild(document.createTextNode("  | btn_demo  | ")); 
-        toctitle.appendChild(btn_demo);
 
         //Now add all the created elements into the HTML document
         toctitle.appendChild(toctoggle);
-        toctitle.appendChild(toc_lock);
-        toctitle.appendChild(toc_unlock);
+        toctitle.appendChild(toc_enable);
+        toctitle.appendChild(toc_disable);
     },
     
     init_toc_chapter_listing:function()
@@ -376,17 +359,9 @@ var wiki_toc=
         }
     },
 
-    set_state_on_and_unlocked:function()
+    set_state_on:function()
     {
-        /** activates lhstoc on the left hand panel, and let it float */
-        this.event_toc_unlock();
-        this.toc_toggle_left();
-    },
-
-    set_state_on_and_locked:function()
-    {
-        /** activates lhstoc on the left hand panel, and set it locked, so it always appear on lhs*/
-        this.event_toc_lock();
+        /** activates lhstoc on the left hand panel*/
         this.toc_toggle_left();
     },
 
@@ -403,8 +378,6 @@ var wiki_toc=
         util.debug("toc_toggle_left()");
         
         var toc_height = window.innerHeight.toString() + "px";
-        //var toc_width = $("#content").offsetLeft + "px";
-        //var toc_width =  $("#mw-head-base").css('margin-left');
         var toc_width = db.get_wikitoc_margin_position(); 
         if (toc_width == null)
         {
@@ -420,34 +393,20 @@ var wiki_toc=
         lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
         lhs_toc_position += "px";
 
-
-        if ($("#lhs_toc").length == 0)
-        {
-            //lhs_toc doesn't exist, we can recreate it
-
-            var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
-            cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
-            cloned_toc.insertAfter("#p-lang");
-
-            var that = this;
-            $('#lhs_toc').resizable({
-              handles: "e",
-              stop: function(e, ui){
-                  that.event_update_content_margin();
-                },
-            });
-        }
-
+        $("#lhs_toc").trigger("sidebar:open");
         $("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
         $("#lhs_toc").css("display", "block");
         $("#lhs_toc").css("padding-left", "0px");
         $("#lhs_toc").css("padding-right", "0px");
 
+        $("#lhs_toc").css("top", 0);
+        $("#lhs_toc").css("position", "fixed");
+
+
         db.set_wikitoc_on_lhs(true);
         
         //resize the main content section on RHS on fit the size of the TOC on LHS
         this.event_update_content_margin();
-        this.event_toc_scroll_lock();
     },
     
     toc_toggle_right:function()
@@ -457,8 +416,7 @@ var wiki_toc=
         */
         util.debug("|||||||toc_toggle_right()");
         
-        $("#lhs_toc").resizable( "destroy" ); //remove scrolling and associated events
-        $("#lhs_toc").remove();
+        $("#lhs_toc").trigger("sidebar:close");
         
         $("#left-navigation").css('margin-left', this.o.frame_left_navigation);
         $("#content").css('margin-left', this.o.frame_content);
@@ -479,52 +437,7 @@ var wiki_toc=
         }
     },
 
-    event_toc_lock:function()
-    {
-        /** event that locks the lhs_toc to always appear on the LHS */
-        db.set_wikitoc_locked(true);
-        this.event_toc_scroll_lock(); //refresh the toc
-    },
-
-    event_toc_unlock:function()
-    {
-        /** event that sets the lhs_toc to only appear if the user scrolls past the lhs language options */
-        db.set_wikitoc_locked(false);
-        this.event_toc_scroll_lock(); //refresh the toc
-    },
                               
-    event_toc_scroll_lock:function()
-    {
-        /** event that lock position of lhs toc if user scrolls below the lhs panel */
-
-        if (db.get_wikitoc_locked() == true)
-        {
-            //lock the position
-            $("#lhs_toc").css("top", 0);
-            $("#lhs_toc").css("position", "fixed");
-        } else 
-        {
-            var lhs_panel_yposition = $("#p-lang").position()['top'];
-            var lhs_panel_height = $("#p-lang").height();
-            var lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
-
-            var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
-            var lhs_toc_scroll_lock = util.pixels_addition(lhs_toc_position, lhs_mwpanel_yposition);
-
-
-            var curr_scrolltop = (document.documentElement || document.body.parentNode || document.body).scrollTop;
-            if (curr_scrolltop > lhs_toc_scroll_lock) {
-                //lock the position
-                $("#lhs_toc").css("top", 0);
-                $("#lhs_toc").css("position", "fixed");
-            } else {
-                //let it float
-                $("#lhs_toc").css("top", lhs_toc_position);
-                $("#lhs_toc").css("position", "absolute");
-            }
-        }
-    },
-    
     event_page_scroll:function()
     {
         /** event that gets called when user scrolls.
@@ -681,22 +594,11 @@ self.port.on("refresh_wes", function(json_string) {
     util.debug("refresh_wes(): refreshingggggg!!!");
     util.debug("refresh_wes(): " + json_string);
     util.debug("refresh_wes(): wikitoc on lhs?" + json_obj.is_wikitoc_on_lhs);
-    util.debug("refresh_wes(): wikitoc locked?" + json_obj.is_wikitoc_locked);
 
-    if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == true)
+    if (json_obj.is_wikitoc_on_lhs == true )
     {
         wiki_toc.toc_toggle_left();
-        wiki_toc.set_state_on_and_locked();
-        wiki_toc.event_toc_scroll_lock();
-        util.debug("refresh_wes(): lets set wikitoc on LHS and locked");
-        util.debug("refresh_wes(): lets update toc scroll lock");
-    }
-    else if (json_obj.is_wikitoc_on_lhs == true && json_obj.is_wikitoc_locked == false)
-    {
-        wiki_toc.toc_toggle_left();
-        wiki_toc.set_state_on_and_unlocked();
-        util.debug("refresh_wes(): lets set wikitoc on LHS and unlocked");
-        util.debug("refresh_wes(): lets update toc scroll lock");
+        util.debug("refresh_wes(): lets set wikitoc on LHS ");
     }
     else if (json_obj.is_wikitoc_on_lhs == false)
     {
@@ -726,29 +628,9 @@ self.port.on("init_wes", function(json_string) {
     {
         var json_obj = JSON.parse(json_string);
         db.set_wikitoc_status(json_obj.is_wes_enabled);
-        db.set_wikitoc_locked(json_obj.is_wikitoc_locked);
         db.set_wikitoc_on_lhs(json_obj.is_wikitoc_on_lhs);
         db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
 
         setTimeout( function() { wiki_toc.init() }, 50);
-    }
-    
-    {
-        var cloned_toc = $("#toc").clone().attr('id', 'rhs_toc');
-        cloned_toc.find('#toctitle').attr('id', 'rhs_toctitle');
-        cloned_toc.insertAfter("#p-lang");
-        $("#rhs_toc").removeClass("toc");
-        $("#rhs_toc").addClass("sidebar left");
-        $("#rhs_toc").sidebar({side: "left"});
-
-        var toc_lock = null;
-        //jtoc_lock.addEventListener("click", function(){ alert("yeah"); $("rhs_toc").trigger("sidebar:toggle");alert("yeah"); } );
-        setTimeout( function() 
-                {
-        toc_lock = $("#btn_demo")[0];
-        console.log(toc_lock);
-        //toc_lock.addEventListener("click", function(){ alert("yeah"); } );
-        toc_lock.addEventListener("click", function(){ console.log("button demo"); $("#rhs_toc").trigger("sidebar:toggle");console.log("button demo"); } );
-                }, 100);
     }
 });

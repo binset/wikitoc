@@ -6,7 +6,6 @@
  *  Developed with <3 and JavaScript by jillix developers.
  *  Copyright (c) 2013-14 jillix
  * */
-                console.log("hmmmmm sidebar???");
 (function($) {
 
     /**
@@ -54,7 +53,7 @@
      * @return {jQuery} The jQuery elements that were selected.
      */
     $.fn.sidebar = function(options) {
-console.log("hmmmmm sidebar???");
+
         var self = this;
         if (self.length > 1) {
             return self.each(function () {
@@ -99,7 +98,6 @@ console.log("hmmmmm sidebar???");
          *  $([jQuery selector]).trigger("sidebar:open");
          * */
         self.on("sidebar:open", function() {
-                console.log("hmmmmm sidebar open???");
             var properties = {};
             properties[settings.side] = settings.range[1];
             settings.isClosed = null;
@@ -107,7 +105,6 @@ console.log("hmmmmm sidebar???");
                 settings.isClosed = false;
                 self.trigger("sidebar:opened");
             });
-                console.log("hmmmmm sidebar open!!!");
         });
 
 
@@ -143,11 +140,10 @@ console.log("hmmmmm sidebar???");
                 $(this).show();
             });
         }
-		console.log("hmmmmm sidebar!!!");
+
         return self;
     };
 
     // Version
     $.fn.sidebar.version = "3.0.0";
 })(jQuery);
-                
