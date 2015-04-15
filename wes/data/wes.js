@@ -398,6 +398,8 @@ var wiki_toc=
         lhs_toc_position += "px";
 
         $("#lhs_toc").trigger("sidebar:open");
+        $("#lhs_toc").css("overflow", "auto");
+        $("#lhs_toc").css("overflow-x", "hidden");
         //$("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
         //$("#lhs_toc").css("display", "block");
         //$("#lhs_toc").css("padding-left", "0px");
