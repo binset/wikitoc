@@ -50,7 +50,7 @@ var db =
                 db.set_wikitoc_on_lhs(true);
             else 
                 db.set_wikitoc_on_lhs(false);
-            util.debug("db: porttttttttt setting is_wes_enabled:" + payload);
+            util.debug("db: port.on setting is_wes_enabled:" + payload);
         });
 
         self.port.on("is_wikitoc_on_lhs", function(payload) {
@@ -68,12 +68,12 @@ var db =
             //resize the main content section on RHS on fit the size of the TOC on LHS
             wiki_toc.event_update_content_margin();
 
-            util.debug("db: porttttttttt setting is_wikitoc_on_lhs:" + payload);
+            util.debug("db: port.on setting is_wikitoc_on_lhs:" + payload);
         });
 
         self.port.on("wikitoc_margin_position", function(payload) {
             db.set_wikitoc_margin_position(payload);
-            util.debug("db: porttttttttt setting wikitoc_margin_position:" + payload);
+            util.debug("db: port.on setting wikitoc_margin_position:" + payload);
         });
     },
 
@@ -87,7 +87,7 @@ var db =
     {
         this.is_wes_enabled = payload;
         self.port.emit("is_wes_enabled", this.is_wes_enabled);
-        util.debug("db: setting is_wes_enabled:" + this.is_wes_enabled);
+        util.debug("db: port.emit is_wes_enabled:" + this.is_wes_enabled);
     },
     
     get_wikitoc_on_lhs:function()
@@ -100,7 +100,7 @@ var db =
     {
         this.is_wikitoc_on_lhs = payload;
         self.port.emit("is_wikitoc_on_lhs", this.is_wikitoc_on_lhs);
-        util.debug("db: setting is_wikitoc_on_lhs:" + this.is_wikitoc_on_lhs);
+        util.debug("db: port.emit is_wikitoc_on_lhs:" + this.is_wikitoc_on_lhs);
     },
 
     get_wikitoc_margin_position:function()
@@ -115,7 +115,7 @@ var db =
         
         this.wikitoc_margin_position = payload;
         self.port.emit("wikitoc_margin_position", this.wikitoc_margin_position);
-        util.debug("db: setting wikitoc_margin_position" + this.wikitoc_margin_position);
+        util.debug("db: port.emit wikitoc_margin_position" + this.wikitoc_margin_position);
     },
 };
 
@@ -123,10 +123,10 @@ var util =
 {
     debug:function(debug_string)
     {
-        var debugging = false;
+        var debugging = true;
         if (debugging)
         {
-            console.log("_________DEBUG: " + debug_string);
+            console.log("_________wes.js: " + debug_string);
         }
     },
 
@@ -196,7 +196,8 @@ var wiki_toc=
                 });
                 $("#lhs_toc").removeClass("toc");
                 $("#lhs_toc").addClass("sidebar left");
-                $("#lhs_toc").sidebar({side: "left"});
+                $("#lhs_toc").sidebar({speed: 10});
+                $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
             }
 
             util.debug("Initialising wiki_toc()...1");
@@ -204,17 +205,20 @@ var wiki_toc=
             util.debug("Initialising wiki_toc()...2");
             this.init_toc_chapter_listing();
             util.debug("Initialising wiki_toc()...3");
-            
+
             if (db.get_wikitoc_on_lhs() == null)
             {
                 //initialise wikitoc on lhs for new sites to be LHS
                 db.set_wikitoc_on_lhs(true);
             }
             util.debug("Initialising wiki_toc()...4");
-            
+
             if (db.get_wikitoc_on_lhs() == true)
             {
-                    this.toc_toggle_left();
+                var that = this;
+                setTimeout( function() {
+                        that.toc_toggle_left();
+                }, 100);
             }
             util.debug("Initialising wiki_toc()...5");
             this.init_html_buttons();
@@ -394,13 +398,13 @@ var wiki_toc=
         lhs_toc_position += "px";
 
         $("#lhs_toc").trigger("sidebar:open");
-        $("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
-        $("#lhs_toc").css("display", "block");
-        $("#lhs_toc").css("padding-left", "0px");
-        $("#lhs_toc").css("padding-right", "0px");
+        //$("#lhs_toc").css({"z-index": "1", height: toc_height, width: toc_width, overflow: 'auto', position: 'absolute', left:'0px', top: lhs_toc_position });
+        //$("#lhs_toc").css("display", "block");
+        //$("#lhs_toc").css("padding-left", "0px");
+        //$("#lhs_toc").css("padding-right", "0px");
 
-        $("#lhs_toc").css("top", 0);
-        $("#lhs_toc").css("position", "fixed");
+        //$("#lhs_toc").css("top", 0);
+        //$("#lhs_toc").css("position", "fixed");
 
 
         db.set_wikitoc_on_lhs(true);
@@ -428,6 +432,7 @@ var wiki_toc=
     {
         /** based on the width of lhs_toc, update the position of the main CONTENTS margin to follow that of the lhs_toc */
         
+        util.debug("|||||||event_update_content_margin()");
         if (db.get_wikitoc_on_lhs())
         {
             var lhs_toc_width = parseInt($("#lhs_toc").css('width'));
@@ -597,6 +602,8 @@ self.port.on("refresh_wes", function(json_string) {
 
     if (json_obj.is_wikitoc_on_lhs == true )
     {
+        $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
+        db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
         wiki_toc.toc_toggle_left();
         util.debug("refresh_wes(): lets set wikitoc on LHS ");
     }
@@ -610,6 +617,8 @@ self.port.on("refresh_wes", function(json_string) {
         util.debug("refresh_wes(): lets do nothing");
     }
 
+    $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
+    util.debug("refresh_wes(): what is lhs_toc's width?: " + $("#lhs_toc").css("width"));
     db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
     wiki_toc.event_update_content_margin();
     util.debug("refresh_wes():_lets update content margin: " + json_obj.wikitoc_margin_position);
@@ -626,6 +635,7 @@ self.port.on("init_wes", function(json_string) {
         return;
     } else 
     {
+        
         var json_obj = JSON.parse(json_string);
         db.set_wikitoc_status(json_obj.is_wes_enabled);
         db.set_wikitoc_on_lhs(json_obj.is_wikitoc_on_lhs);

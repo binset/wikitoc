@@ -182,6 +182,7 @@ tabs.on('activate', function () {
         };
         var json_string = JSON.stringify(json_obj);
         console.log('active: ' + json_string);
+        var worker = null;
         worker = getActiveWorker();
         if (worker)
         {
@@ -227,11 +228,11 @@ pageMod.PageMod({
         worker.port.emit("init_wes", json_string);
 
         worker.port.on("is_wes_enabled", function(payload) {
-            console.log("main.js: setting is wikitoc_enabled:" + payload);
+            console.log("main.js: port.on is wikitoc_enabled:" + payload);
             localStorage.setItem("is_wes_enabled", payload);
         });
         worker.port.on("is_wikitoc_on_lhs", function(payload) {
-            console.log("main.js: setting is_wikitoc_on_lhs:" + payload);
+            console.log("main.js: port.on is_wikitoc_on_lhs:" + payload);
             localStorage.setItem("is_wikitoc_on_lhs", payload);
             if (payload == true) {
                 button_activated.state(button_activated, lhswikitoc_activated);
@@ -243,7 +244,7 @@ pageMod.PageMod({
             }
         });
         worker.port.on("is_wikitoc_locked", function(payload) {
-            console.log("main.js: setting is_wikitoc_locked:" + payload);
+            console.log("main.js: port.on is_wikitoc_locked:" + payload);
             localStorage.setItem("is_wikitoc_locked", payload);
             if (payload == true) {
                 button_locked.state(button_locked, wes_locked);
@@ -255,7 +256,7 @@ pageMod.PageMod({
             }
         });
         worker.port.on("wikitoc_margin_position", function(payload) {
-            console.log("main.js: setting wikitoc_margin_position:" + payload);
+            console.log("main.js: port.on wikitoc_margin_position:" + payload);
             localStorage.setItem("wikitoc_margin_position", payload);
         });
     }
@@ -284,6 +285,7 @@ var panel = panels.Panel({
 function handleChange(state) {
     if (state.checked) {
         panel.show({ position: button_ui });
+        var payload;
         payload = {};
         payload.is_wes_enabled =          localStorage.getItem("is_wes_enabled");
         payload.is_wikitoc_locked =       localStorage.getItem("is_wikitoc_locked");
@@ -298,12 +300,12 @@ function handleHide() {
 };
 
 panel.port.on("is_wes_enabled", function(payload) {
-    console.log("main.js: setting is wikitoc_enabled:" + payload);
+    console.log("main.js: panel.port.on is wikitoc_enabled:" + payload);
     localStorage.setItem("is_wes_enabled", payload);
     update_wes();
 });
 panel.port.on("is_wikitoc_on_lhs", function(payload) {
-    console.log("main.js: setting is_wikitoc_on_lhs:" + payload);
+    console.log("main.js: panel.port.on is_wikitoc_on_lhs:" + payload);
     localStorage.setItem("is_wikitoc_on_lhs", payload);
     update_wes();
     if (payload == true) {
@@ -316,7 +318,7 @@ panel.port.on("is_wikitoc_on_lhs", function(payload) {
     }
 });
 panel.port.on("is_wikitoc_locked", function(payload) {
-    console.log("main.js: setting is_wikitoc_locked:" + payload);
+    console.log("main.js: panel.port.on is_wikitoc_locked:" + payload);
     localStorage.setItem("is_wikitoc_locked", payload);
     update_wes();
     if (payload == true) {
@@ -329,7 +331,7 @@ panel.port.on("is_wikitoc_locked", function(payload) {
     }
 });
 panel.port.on("wikitoc_margin_position", function(payload) {
-    console.log("main.js: setting wikitoc_margin_position:" + payload);
+    console.log("main.js: panel.port.on wikitoc_margin_position:" + payload);
     localStorage.setItem("wikitoc_margin_position", payload);
     update_wes();
 });

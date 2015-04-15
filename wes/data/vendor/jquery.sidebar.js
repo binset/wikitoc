@@ -114,7 +114,15 @@
          * */
         self.on("sidebar:close", function(callback) {
             var properties = {};
-            properties[settings.side] = settings.range[0];
+            if (settings.side == "left" || settings.side == "right")
+            {
+                var width = self.outerWidth();
+                properties[settings.side] = -width;
+            } else 
+            {
+                var height = self.outerHeight();
+                properties[settings.side] = -height;
+            }
             settings.isClosed = null;
             self.stop().animate(properties, settings.speed, function() {
                 settings.isClosed = true;
