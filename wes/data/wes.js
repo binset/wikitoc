@@ -196,7 +196,7 @@ var wiki_toc=
                 });
                 $("#lhs_toc").removeClass("toc");
                 $("#lhs_toc").addClass("sidebar left");
-                $("#lhs_toc").sidebar({speed: 10});
+                $("#lhs_toc").sidebar({speed: 1});
                 $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
 
                 var btn_div = document.createElement('div');
@@ -236,7 +236,7 @@ var wiki_toc=
                 var that = this;
                 setTimeout( function() {
                         that.toc_open();
-                }, 100);
+                }, 20);
             }
             util.debug("Initialising wiki_toc()...5");
             this.init_html_buttons();
