@@ -198,6 +198,24 @@ var wiki_toc=
                 $("#lhs_toc").addClass("sidebar left");
                 $("#lhs_toc").sidebar({speed: 10});
                 $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
+
+                var btn_div = document.createElement('div');
+                btn_div.setAttribute("id", "btn_div");
+
+                var btn_toggle = document.createElement('button');
+                btn_toggle.setAttribute("id", "btn_toggle");
+                btn_toggle.innerHTML = "toggle";
+                btn_div.appendChild(btn_toggle);
+                $("#lhs_toc")[0].appendChild(btn_div);
+
+                $("#btn_div").css("left", db.get_wikitoc_margin_position());
+                $("#btn_div").css("position", "relative");
+                $("#btn_toggle").css("bottom", "20px");
+                $("#btn_toggle").css("position", "fixed");
+
+                $("#btn_toggle").on("click", function () {
+                    wiki_toc.toc_toggle();
+                });
             }
 
             util.debug("Initialising wiki_toc()...1");
@@ -416,6 +434,8 @@ var wiki_toc=
         $("#left-navigation").css('margin-left', this.o.frame_left_navigation);
         $("#content").css('margin-left', this.o.frame_content);
         $("#footer").css('margin-left', this.o.frame_footer);
+        $("#btn_div").css("left", 0);
+        $("#btn_div").css("position", "fixed");
         db.set_wikitoc_on_lhs(false);
     },
     
@@ -431,6 +451,8 @@ var wiki_toc=
             $("#left-navigation").css('margin-left', lhs_toc_width + "px");
             $("#content").css('margin-left', lhs_toc_width + "px" );
             $("#footer").css('margin-left', lhs_toc_width + "px" );
+            $("#btn_div").css("left", lhs_toc_width);
+            $("#btn_div").css("position", "relative");
             db.set_wikitoc_margin_position(lhs_toc_width); 
         }
     },
