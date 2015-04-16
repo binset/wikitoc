@@ -57,12 +57,12 @@ var db =
             if (payload == true)
             {
                 db.set_wikitoc_on_lhs(true);
-                wiki_toc.toc_toggle_left();
+                wiki_toc.toc_open();
             }
             else 
             {
                 db.set_wikitoc_on_lhs(false);
-                wiki_toc.toc_toggle_right();
+                wiki_toc.toc_close();
             }
 
             //resize the main content section on RHS on fit the size of the TOC on LHS
@@ -170,7 +170,7 @@ var wiki_toc=
         // then save TOC CSS settings
         // then save frame CSS settings
         // then add buttons to TOC
-        // then run toc_toggle_left()
+        // then run toc_open()
         // then adds the page_scroll event
         
         this.o.events = {}; //stores hash of event handlers
@@ -217,7 +217,7 @@ var wiki_toc=
             {
                 var that = this;
                 setTimeout( function() {
-                        that.toc_toggle_left();
+                        that.toc_open();
                 }, 100);
             }
             util.debug("Initialising wiki_toc()...5");
@@ -242,12 +242,12 @@ var wiki_toc=
         this.event_add(toctoggle,'click','toc_toggle',this.o);
 
         var toc_enable = document.getElementById("toc_enable");
-        this.event_add(toc_enable,'click','set_state_on',this.o);
+        this.event_add(toc_enable,'click','toc_open',this.o);
         
         var toc_disable = document.getElementById("toc_disable");
-        this.event_add(toc_disable,'click','set_state_off',this.o);
+        this.event_add(toc_disable,'click','toc_close',this.o);
 
-        this.event_add(window,'resize','toc_toggle_left',this.o);
+        this.event_add(window,'resize','toc_open',this.o);
     },
     
     init_save_positions:function()
@@ -355,32 +355,20 @@ var wiki_toc=
         if (db.get_wikitoc_on_lhs() == true)
         {
             util.debug("going to move TOC to right");
-            this.toc_toggle_right();
+            this.toc_close();
             
         } else 
         {
             util.debug("going to move TOC to left");
-            this.toc_toggle_left();
+            this.toc_open();
         }
     },
 
-    set_state_on:function()
-    {
-        /** activates lhstoc on the left hand panel*/
-        this.toc_toggle_left();
-    },
-
-    set_state_off:function()
-    {
-        /** deactivate lhstoc on the left hand panel*/
-        this.toc_toggle_right();
-    },
-        
-    toc_toggle_left:function()
+    toc_open:function()
     {
         /**toggle TOC to LHS
         */
-        util.debug("toc_toggle_left()");
+        util.debug("toc_open()");
         
         var toc_height = window.innerHeight.toString() + "px";
         var toc_width = db.get_wikitoc_margin_position(); 
@@ -395,7 +383,7 @@ var wiki_toc=
         var lhs_mwpanel_yposition = $("#mw-panel").position()['top'];
         var lhs_panel_yposition = $("#p-lang").position()['top'];
         var lhs_panel_height = $("#p-lang").height();
-        lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
+        var lhs_toc_position = util.pixels_addition(lhs_panel_height, lhs_panel_yposition);
         lhs_toc_position += "px";
 
         $("#lhs_toc").trigger("sidebar:open");
@@ -416,12 +404,12 @@ var wiki_toc=
         this.event_update_content_margin();
     },
     
-    toc_toggle_right:function()
+    toc_close:function()
     {
         /* move TOC to LHS
         uses original toc values from o.toc_original dictionary.
         */
-        util.debug("|||||||toc_toggle_right()");
+        util.debug("|||||||toc_close()");
         
         $("#lhs_toc").trigger("sidebar:close");
         
@@ -609,12 +597,12 @@ self.port.on("refresh_wes", function(json_string) {
     {
         $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
         db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
-        wiki_toc.toc_toggle_left();
+        wiki_toc.toc_open();
         util.debug("refresh_wes(): lets set wikitoc on LHS ");
     }
     else if (json_obj.is_wikitoc_on_lhs == false)
     {
-        wiki_toc.set_state_off();
+        wiki_toc.toc_open();
         util.debug("refresh_wes(): lets toggle right");
     }
     else 

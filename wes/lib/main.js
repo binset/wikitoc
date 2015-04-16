@@ -49,16 +49,6 @@ const lhswikitoc_deactivated = {
   "icon": "./browser_off.png",
 }
 
-const wes_locked = {
-  "label": "Table of Contents on LHS is now locked",
-  "icon": "./locked.png",
-}
-
-const wes_unlocked = {
-  "label": "Table of Contents on LHS is now unlocked",
-  "icon": "./unlocked.png",
-}
-
 var button_activated = buttons.ToggleButton({
   id: "button_activated",
   label: lhswikitoc_activated.label,
@@ -81,7 +71,6 @@ function handle_activate_click(state) {
     {
         console.log("main.js: handle_activate_click()");
         worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-        worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
         worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
     } else
     {
@@ -90,35 +79,6 @@ function handle_activate_click(state) {
 
 }
 
-var button_locked = buttons.ToggleButton({
-  id: "button_locked",
-  label: wes_locked.label,
-  icon: wes_locked.icon,
-  onClick: handle_lock_click
-});
-function handle_lock_click(state) {
-    button_locked.checked = !button_locked.checked;
-    localStorage.setItem("is_wikitoc_locked", button_locked.checked)
-
-    if (button_locked.checked == true) {
-        button_locked.state(button_locked, wes_locked);
-    }
-    else {
-        button_locked.state(button_locked, wes_unlocked);
-    }
-
-    worker = getActiveWorker();
-    if (worker)
-    {
-        console.log("main.js: handle_lock_click()");
-        worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-        worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
-        worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
-    } else
-    {
-        console.log("main.js: I can't find your worker mate");
-    }
-}
 
 function init() {
     {
@@ -146,22 +106,6 @@ function init() {
         }
     }
 
-    {
-        //is_wikitoc_locked
-        let is_wikitoc_locked = localStorage.getItem("is_wikitoc_locked");
-        if (is_wikitoc_locked == undefined || is_wikitoc_locked == null) {
-            localStorage.setItem("is_wikitoc_locked", true);
-        } 
-
-        is_wikitoc_locked = localStorage.getItem("is_wikitoc_locked");
-        if (is_wikitoc_locked == true) {
-            button_locked.checked = true;
-            button_locked.state(button_locked, wes_locked);
-        } else {
-            button_locked.checked = false;
-            button_locked.state(button_locked, wes_unlocked);
-        }
-    }
 }
 
 
@@ -177,7 +121,6 @@ tabs.on('activate', function () {
         {
             "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
             "is_wikitoc_on_lhs": button_activated.checked,
-            "is_wikitoc_locked": button_locked.checked,
             "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
         };
         var json_string = JSON.stringify(json_obj);
@@ -219,7 +162,6 @@ pageMod.PageMod({
         var json_obj = 
         {
             "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
-            "is_wikitoc_locked": localStorage.getItem("is_wikitoc_locked"),
             "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
             "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
         };
@@ -241,18 +183,6 @@ pageMod.PageMod({
             else {
                 button_activated.state(button_activated, lhswikitoc_deactivated);
                 button_activated.checked = false;
-            }
-        });
-        worker.port.on("is_wikitoc_locked", function(payload) {
-            console.log("main.js: port.on is_wikitoc_locked:" + payload);
-            localStorage.setItem("is_wikitoc_locked", payload);
-            if (payload == true) {
-                button_locked.state(button_locked, wes_locked);
-                button_locked.checked = true;
-            }
-            else {
-                button_locked.state(button_locked, wes_unlocked);
-                button_locked.checked = false;
             }
         });
         worker.port.on("wikitoc_margin_position", function(payload) {
@@ -288,7 +218,6 @@ function handleChange(state) {
         var payload;
         payload = {};
         payload.is_wes_enabled =          localStorage.getItem("is_wes_enabled");
-        payload.is_wikitoc_locked =       localStorage.getItem("is_wikitoc_locked");
         payload.is_wikitoc_on_lhs =       localStorage.getItem("is_wikitoc_on_lhs");
         payload.wikitoc_margin_position = localStorage.getItem("wikitoc_margin_position");
         panel.port.emit("panelclick", payload);
@@ -317,19 +246,6 @@ panel.port.on("is_wikitoc_on_lhs", function(payload) {
         button_activated.checked = false;
     }
 });
-panel.port.on("is_wikitoc_locked", function(payload) {
-    console.log("main.js: panel.port.on is_wikitoc_locked:" + payload);
-    localStorage.setItem("is_wikitoc_locked", payload);
-    update_wes();
-    if (payload == true) {
-        button_locked.state(button_locked, wes_locked);
-        button_locked.checked = true;
-    }
-    else {
-        button_locked.state(button_locked, wes_unlocked);
-        button_locked.checked = false;
-    }
-});
 panel.port.on("wikitoc_margin_position", function(payload) {
     console.log("main.js: panel.port.on wikitoc_margin_position:" + payload);
     localStorage.setItem("wikitoc_margin_position", payload);
@@ -342,7 +258,6 @@ function update_wes(){
     {
         console.log("main.js: update_wes()");
         worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-        worker.port.emit("is_wikitoc_locked", localStorage.getItem("is_wikitoc_locked"));
         worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
     } else
     {

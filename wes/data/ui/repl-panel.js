@@ -17,7 +17,6 @@ function receive(event) {
 self.port.on("panelclick", function(payload) {
     document.getElementById("is_wes_enabled").textContent = payload.is_wes_enabled;
     document.getElementById("is_wikitoc_on_lhs").textContent = payload.is_wikitoc_on_lhs;
-    document.getElementById("is_wikitoc_locked").textContent = payload.is_wikitoc_locked;
     document.getElementById("wikitoc_margin_position").textContent = payload.wikitoc_margin_position;
 });
 
@@ -45,19 +44,6 @@ document.getElementById("is_wikitoc_on_lhs").onclick = function()
     console.log("clicking is_wikitoc_on_lhs.. gonna be:" + newvalue);
     self.port.emit("is_wikitoc_on_lhs", newvalue);
     document.getElementById("is_wikitoc_on_lhs").textContent = newvalue;;
-};
-
-document.getElementById("is_wikitoc_locked").onclick = function()
-{
-    var value = document.getElementById("is_wikitoc_locked").textContent;
-    var newvalue;
-    if (value == "true")
-        newvalue = !true;
-    else
-        newvalue = !false;
-    console.log("clicking is_wikitoc_locked.. gonna be:" + newvalue);
-    self.port.emit("is_wikitoc_locked", newvalue);
-    document.getElementById("is_wikitoc_locked").textContent = newvalue;
 };
 
 document.getElementById("wikitoc_margin_position").onclick = function()
