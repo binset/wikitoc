@@ -265,6 +265,7 @@ var wiki_toc=
         //save LHS frame settings
         this.o.frame_left_navigation = $("#left-navigation").css('margin-left');
         this.o.frame_content = $("#content").css('margin-left');
+        this.o.frame_footer = $("#footer").css('margin-left');
     },
 
     init_html_buttons:function()
@@ -426,6 +427,7 @@ var wiki_toc=
         
         $("#left-navigation").css('margin-left', this.o.frame_left_navigation);
         $("#content").css('margin-left', this.o.frame_content);
+        $("#footer").css('margin-left', this.o.frame_footer);
         db.set_wikitoc_on_lhs(false);
     },
     
@@ -440,6 +442,7 @@ var wiki_toc=
             var lhs_toc_width = parseInt($("#lhs_toc").css('width'));
             $("#left-navigation").css('margin-left', lhs_toc_width + "px");
             $("#content").css('margin-left', lhs_toc_width + "px" );
+            $("#footer").css('margin-left', lhs_toc_width + "px" );
             db.set_wikitoc_margin_position(lhs_toc_width); 
         }
     },
