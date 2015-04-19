@@ -184,7 +184,9 @@ var wiki_toc=
                 //lhs_toc doesn't exist, we can recreate it
 
                 var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
-                cloned_toc.find('#toctitle').attr('id', 'lhs_toctitle');
+                cloned_toc.addClass("toc");
+                cloned_toc.addClass("mw-body-content");
+                cloned_toc.find('.toctoggle').remove();
                 cloned_toc.insertAfter("#p-lang");
 
                 var that = this;
@@ -199,23 +201,37 @@ var wiki_toc=
                 $("#lhs_toc").sidebar({speed: 1});
                 $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
 
-                var btn_div = document.createElement('div');
-                btn_div.setAttribute("id", "btn_div");
 
-                var btn_toggle = document.createElement('button');
-                btn_toggle.setAttribute("id", "btn_toggle");
-                btn_toggle.innerHTML = "toggle";
-                btn_div.appendChild(btn_toggle);
-                $("#lhs_toc")[0].appendChild(btn_div);
+                {
+                    //toggle button
+                    var toctoggle = document.createElement('a');
+                    toctoggle.setAttribute("id", "toctoggle");
+                    toctoggle.setAttribute("title", "Click here to toggle TOC between Left Hand or Right Hand panel");
+                    var toctoggle_img = document.createElement('img');
+                    toctoggle_img.setAttribute("width", "30");
+                    toctoggle_img.setAttribute("height", "30");
+                    toctoggle_img.setAttribute("srcset", "30");
+                    toctoggle_img.setAttribute("src", "https://raw.githubusercontent.com/teamrc/wikitoc/main/wes/data/appbar.arrow.right.left.png");
+                    toctoggle_img.setAttribute("alt", "toggle_toc");
+                    toctoggle.appendChild(toctoggle_img);
 
-                $("#btn_div").css("left", db.get_wikitoc_margin_position());
-                $("#btn_div").css("position", "relative");
-                $("#btn_toggle").css("bottom", "20px");
-                $("#btn_toggle").css("position", "fixed");
+                    var btn_div = document.createElement('div');
+                    btn_div.setAttribute("id", "btn_div");
 
-                $("#btn_toggle").on("click", function () {
-                    wiki_toc.toc_toggle();
-                });
+                    btn_div.appendChild(toctoggle);
+                    $("#lhs_toc")[0].appendChild(btn_div);
+
+                    $("#btn_div").css("left", db.get_wikitoc_margin_position());
+                    $("#btn_div").css("position", "relative");
+                    $("#btn_toggle").css("bottom", "20px");
+                    $("#btn_toggle").css("position", "fixed");
+
+                    $("#toctoggle").css("bottom", "20px");
+                    $("#toctoggle").css("position", "fixed");
+                    $("#toctoggle").on("click", function () {
+                        wiki_toc.toc_toggle();
+                    });
+                }
             }
 
             util.debug("Initialising wiki_toc()...1");
