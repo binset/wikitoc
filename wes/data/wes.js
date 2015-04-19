@@ -211,7 +211,7 @@ var wiki_toc=
                     toctoggle_img.setAttribute("width", "30");
                     toctoggle_img.setAttribute("height", "30");
                     toctoggle_img.setAttribute("srcset", "30");
-                    toctoggle_img.setAttribute("src", "https://raw.githubusercontent.com/teamrc/wikitoc/main/wes/data/appbar.arrow.right.left.png");
+                    toctoggle_img.setAttribute("src", "https://raw.githubusercontent.com/teamrc/wikitoc/master/wes/data/appbar.arrow.right.left.png");
                     toctoggle_img.setAttribute("alt", "toggle_toc");
                     toctoggle.appendChild(toctoggle_img);
 
