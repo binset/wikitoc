@@ -38,77 +38,18 @@ function detachWorker(worker, workerArray) {
     }
 }
 
-
-const lhswikitoc_activated = {
-  "label": "Wikipedia Enhancement Suite is now Activated",
-  "icon": "./browser_on.png",
-}
-
-const lhswikitoc_deactivated = {
-  "label": "Wikipedia Enhancement Suite is now Deactivated",
-  "icon": "./browser_off.png",
-}
-
-var button_activated = buttons.ToggleButton({
-  id: "button_activated",
-  label: lhswikitoc_activated.label,
-  icon: lhswikitoc_activated.icon,
-  onClick: handle_activate_click
-});
-function handle_activate_click(state) {
-  button_activated.checked = !button_activated.checked;
-  localStorage.setItem("is_wikitoc_on_lhs", button_activated.checked)
-
-  if (button_activated.checked == true) {
-    button_activated.state(button_activated, lhswikitoc_activated);
-  }
-  else {
-    button_activated.state(button_activated, lhswikitoc_deactivated);
-  }
-
-    worker = getActiveWorker();
-    if (worker)
-    {
-        console.log("main.js: handle_activate_click()");
-        worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-        worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
-    } else
-    {
-        console.log("main.js: I can't find your worker mate");
-    }
-
-}
-
-
 function init() {
-    {
-        //is_wes_enabled
-        let is_wikitoc_on_lhs = localStorage.getItem("is_wes_enabled");
-        if (is_wikitoc_on_lhs == undefined || is_wikitoc_on_lhs == null) {
-            localStorage.setItem("is_wes_enabled", true);
-        }
+    //is_wes_enabled
+    let is_wes_enabled = localStorage.getItem("is_wes_enabled");
+    if (is_wes_enabled == undefined || is_wes_enabled == null) {
+        localStorage.setItem("is_wes_enabled", true);
     }
-
-    {
-        //is_wikitoc_on_lhs
-        let is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
-        if (is_wikitoc_on_lhs == undefined || is_wikitoc_on_lhs == null) {
-            localStorage.setItem("is_wikitoc_on_lhs", true);
-        } 
-
-        is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
-        if (is_wikitoc_on_lhs == true) {
-            button_activated.checked = true;
-            button_activated.state(button_activated, lhswikitoc_activated);
-        } else {
-            button_activated.checked = false;
-            button_activated.state(button_activated, lhswikitoc_deactivated);
-        }
-    }
-
+    //is_wikitoc_on_lhs
+    let is_wikitoc_on_lhs = localStorage.getItem("is_wikitoc_on_lhs");
+    if (is_wikitoc_on_lhs == undefined || is_wikitoc_on_lhs == null) {
+        localStorage.setItem("is_wikitoc_on_lhs", true);
+    } 
 }
-
-
 init()
 
 tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
@@ -121,7 +62,7 @@ tabs.on('activate', function () {
         var json_obj = 
         {
             "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
-            "is_wikitoc_on_lhs": button_activated.checked,
+            "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
             "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
         };
         var json_string = JSON.stringify(json_obj);
@@ -177,14 +118,6 @@ pageMod.PageMod({
         worker.port.on("is_wikitoc_on_lhs", function(payload) {
             console.log("main.js: port.on is_wikitoc_on_lhs:" + payload);
             localStorage.setItem("is_wikitoc_on_lhs", payload);
-            if (payload == true) {
-                button_activated.state(button_activated, lhswikitoc_activated);
-                button_activated.checked = true;
-            }
-            else {
-                button_activated.state(button_activated, lhswikitoc_deactivated);
-                button_activated.checked = false;
-            }
         });
         worker.port.on("wikitoc_margin_position", function(payload) {
             console.log("main.js: port.on wikitoc_margin_position:" + payload);
@@ -193,76 +126,4 @@ pageMod.PageMod({
     }
 });
 
-
-
-var button_ui = buttons.ToggleButton({
-    id: "button_ui",
-    label: "wikitoc",
-    icon: "./w_blue.png",
-    onChange: handleChange
-});
-
-var panel = panels.Panel({
-    contentURL: self.data.url("ui/panel.html"),
-    contentScriptFile: self.data.url("ui/repl-panel.js"),
-    onHide: handleHide,
-    onReady: function() {
-        console.log('panel is ready!');
-        //this.postMessage("init", "blah blah");
-        //this.port.emit("init", 'wee');
-    }
-});
-
-function handleChange(state) {
-    if (state.checked) {
-        panel.show({ position: button_ui });
-        var payload;
-        payload = {};
-        payload.is_wes_enabled =          localStorage.getItem("is_wes_enabled");
-        payload.is_wikitoc_on_lhs =       localStorage.getItem("is_wikitoc_on_lhs");
-        payload.wikitoc_margin_position = localStorage.getItem("wikitoc_margin_position");
-        panel.port.emit("panelclick", payload);
-    }
-};
-
-function handleHide() {
-    button_ui.state('window', {checked: false});
-};
-
-panel.port.on("is_wes_enabled", function(payload) {
-    console.log("main.js: panel.port.on is wikitoc_enabled:" + payload);
-    localStorage.setItem("is_wes_enabled", payload);
-    update_wes();
-});
-panel.port.on("is_wikitoc_on_lhs", function(payload) {
-    console.log("main.js: panel.port.on is_wikitoc_on_lhs:" + payload);
-    localStorage.setItem("is_wikitoc_on_lhs", payload);
-    update_wes();
-    if (payload == true) {
-        button_activated.state(button_activated, lhswikitoc_activated);
-        button_activated.checked = true;
-    }
-    else {
-        button_activated.state(button_activated, lhswikitoc_deactivated);
-        button_activated.checked = false;
-    }
-});
-panel.port.on("wikitoc_margin_position", function(payload) {
-    console.log("main.js: panel.port.on wikitoc_margin_position:" + payload);
-    localStorage.setItem("wikitoc_margin_position", payload);
-    update_wes();
-});
-
-function update_wes(){
-    worker = getActiveWorker();
-    if (worker)
-    {
-        console.log("main.js: update_wes()");
-        worker.port.emit("is_wes_enabled", localStorage.getItem("is_wes_enabled"));
-        worker.port.emit("is_wikitoc_on_lhs", localStorage.getItem("is_wikitoc_on_lhs"));
-    } else
-    {
-        console.log("main.js: I can't find your worker mate");
-    }
-}
 
