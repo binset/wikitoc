@@ -204,28 +204,31 @@ var wiki_toc=
 
                 {
                     //toggle button
-                    var toctoggle = document.createElement('a');
+                    var toctoggle = document.createElement('button');
                     toctoggle.setAttribute("id", "toctoggle");
-                    toctoggle.setAttribute("title", "Click here to toggle TOC between Left Hand or Right Hand panel");
-                    var toctoggle_img = document.createElement('img');
-                    toctoggle_img.setAttribute("width", "30");
-                    toctoggle_img.setAttribute("height", "30");
-                    toctoggle_img.setAttribute("srcset", "30");
-                    toctoggle_img.setAttribute("src", "https://raw.githubusercontent.com/teamrc/wikitoc/master/wes/data/appbar.arrow.right.left.png");
-                    toctoggle_img.setAttribute("alt", "toggle_toc");
-                    toctoggle.appendChild(toctoggle_img);
+                    var htmltext = document.createTextNode("Toggle Table of Contents");
+                    toctoggle.appendChild(htmltext);
 
                     var btn_div = document.createElement('div');
                     btn_div.setAttribute("id", "btn_div");
-
                     btn_div.appendChild(toctoggle);
                     $("#lhs_toc")[0].appendChild(btn_div);
 
+
+                    $("#toctoggle").button({
+                        icons: {
+                            primary: "ui-icon ui-icon-transferthick-e-w",
+                        },  
+                        text: false
+                    })
+                    $("#toctoggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
+                    $("#toctoggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
+                    $("#toctoggle>span").css("transform", "scale(1.5)"); 
+
                     $("#btn_div").css("left", db.get_wikitoc_margin_position());
                     $("#btn_div").css("position", "relative");
-                    $("#btn_toggle").css("bottom", "20px");
-                    $("#btn_toggle").css("position", "fixed");
 
+                    $("#toctoggle").css("font-size", "0.7em");
                     $("#toctoggle").css("bottom", "20px");
                     $("#toctoggle").css("position", "fixed");
                     $("#toctoggle").on("click", function () {
