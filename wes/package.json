@@ -5,7 +5,7 @@
   "description": "Enhances the Table of Contents on wikimedia sites including Wikipedia",
   "author": "teamrc",
   "license": "MPL 2.0",
-  "version": "0.9",
+  "version": "1.1",
   "homepage": "https://addons.mozilla.org/en-US/firefox/addon/wiki_enhancement_suite/",
   "readmeFilename": "README.md",
   "icon": "data/w_blue.png",
