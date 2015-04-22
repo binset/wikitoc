@@ -10,6 +10,18 @@ let pageWorkers = require("sdk/page-worker");
 //let workers = require("sdk/content/worker");
 var panels = require("sdk/panel");
 
+var production = true;
+var util = 
+{
+    debug:function(debug_string)
+    {
+        if (production !== true )
+        {
+            console.log("_________main.js: " + debug_string);
+        }
+    },
+}
+
 let localStorage = ss.storage;
 localStorage.getItem = function(key) {
     return ss.storage[key];
@@ -58,7 +70,7 @@ init()
 tabs.on('activate', function () {
     if (/wikipedia/.test(tabs.activeTab.url))
     {
-        console.log('active: ' + tabs.activeTab.url);
+        util.debug('active: ' + tabs.activeTab.url);
         var json_obj = 
         {
             "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
@@ -66,7 +78,7 @@ tabs.on('activate', function () {
             "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
         };
         var json_string = JSON.stringify(json_obj);
-        console.log('active: ' + json_string);
+        util.debug('active: ' + json_string);
         var worker = null;
         worker = getActiveWorker();
         if (worker)
@@ -74,7 +86,7 @@ tabs.on('activate', function () {
             worker.port.emit("refresh_wes", json_string);
         } else
         {
-            console.log("main.js: I can't find your worker mate");
+            util.debug("I can't find your worker mate");
         }
     }
 });
@@ -112,15 +124,15 @@ pageMod.PageMod({
         worker.port.emit("init_wes", json_string);
 
         worker.port.on("is_wes_enabled", function(payload) {
-            console.log("main.js: port.on is wikitoc_enabled:" + payload);
+            util.debug("port.on is wikitoc_enabled:" + payload);
             localStorage.setItem("is_wes_enabled", payload);
         });
         worker.port.on("is_wikitoc_on_lhs", function(payload) {
-            console.log("main.js: port.on is_wikitoc_on_lhs:" + payload);
+            util.debug("port.on is_wikitoc_on_lhs:" + payload);
             localStorage.setItem("is_wikitoc_on_lhs", payload);
         });
         worker.port.on("wikitoc_margin_position", function(payload) {
-            console.log("main.js: port.on wikitoc_margin_position:" + payload);
+            util.debug("port.on wikitoc_margin_position:" + payload);
             localStorage.setItem("wikitoc_margin_position", payload);
         });
     }

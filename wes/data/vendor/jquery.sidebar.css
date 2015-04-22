@@ -1,4 +1,4 @@
-.sidebar.left {
+#lhs_toc.sidebar.left {
     position: fixed;
     top: 0;
     left: 0;
@@ -8,7 +8,7 @@
     background: #FFFFFF;
 }
 
-.sidebar.right {
+#lhs_toc.sidebar.right {
     top: 0;
     right: 0;
     bottom: 0;
@@ -16,7 +16,7 @@
     background: #448AFF;
 }
 
-.sidebar.bottom {
+#lhs_toc.sidebar.bottom {
     left: 0;
     right: 0;
     bottom: 0;
@@ -24,7 +24,7 @@
     background: #03A9F4;
 }
 
-.sidebar.top {
+#lhs_toc.sidebar.top {
     left: 0;
     right: 0;
     top: 0;
@@ -32,6 +32,6 @@
     background: #03A9F4;
 }
 
-.sidebar {
+#lhs_toc.sidebar {
     position: fixed;
 }

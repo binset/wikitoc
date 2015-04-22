@@ -23,6 +23,7 @@
     It also retains the ability for the user to jump to different sections on the TOC by clicking on the links.
 */
 
+var production = true;
 
 var db = 
 {
@@ -46,7 +47,7 @@ var db =
         //initialise content script port listener events
         util.debug("db: initialisation");
         self.port.on("is_wes_enabled", function(payload) {
-            if (payload == true)
+            if (payload === true)
                 db.set_wikitoc_on_lhs(true);
             else 
                 db.set_wikitoc_on_lhs(false);
@@ -54,7 +55,7 @@ var db =
         });
 
         self.port.on("is_wikitoc_on_lhs", function(payload) {
-            if (payload == true)
+            if (payload === true)
             {
                 db.set_wikitoc_on_lhs(true);
                 wiki_toc.toc_open();
@@ -123,8 +124,7 @@ var util =
 {
     debug:function(debug_string)
     {
-        var debugging = true;
-        if (debugging)
+        if (production !== true )
         {
             console.log("_________wes.js: " + debug_string);
         }
@@ -177,9 +177,9 @@ var wiki_toc=
         
         db.set_wikitoc_status(true);
 
-        if (db.get_wikitoc_status() == true) 
+        if (db.get_wikitoc_status() === true) 
         {
-            if ($("#lhs_toc").length == 0)
+            if ($("#lhs_toc").length === 0)
             {
                 //lhs_toc doesn't exist, we can recreate it
 
@@ -204,34 +204,34 @@ var wiki_toc=
 
                 {
                     //toggle button
-                    var toctoggle = document.createElement('button');
-                    toctoggle.setAttribute("id", "toctoggle");
+                    var btn_toggle = document.createElement('button');
+                    btn_toggle.setAttribute("id", "btn_toggle");
                     var htmltext = document.createTextNode("Toggle Table of Contents");
-                    toctoggle.appendChild(htmltext);
+                    btn_toggle.appendChild(htmltext);
 
                     var btn_div = document.createElement('div');
                     btn_div.setAttribute("id", "btn_div");
-                    btn_div.appendChild(toctoggle);
+                    btn_div.appendChild(btn_toggle);
                     $("#lhs_toc")[0].appendChild(btn_div);
 
 
-                    $("#toctoggle").button({
+                    $("#btn_toggle").button({
                         icons: {
                             primary: "ui-icon ui-icon-transferthick-e-w",
                         },  
                         text: false
                     })
-                    $("#toctoggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
-                    $("#toctoggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
-                    $("#toctoggle>span").css("transform", "scale(1.5)"); 
+                    $("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
+                    $("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
+                    $("#btn_toggle>span").css("transform", "scale(1.5)"); 
 
                     $("#btn_div").css("left", db.get_wikitoc_margin_position());
                     $("#btn_div").css("position", "relative");
 
-                    $("#toctoggle").css("font-size", "0.7em");
-                    $("#toctoggle").css("bottom", "20px");
-                    $("#toctoggle").css("position", "fixed");
-                    $("#toctoggle").on("click", function () {
+                    $("#btn_toggle").css("font-size", "0.7em");
+                    $("#btn_toggle").css("bottom", "20px");
+                    $("#btn_toggle").css("position", "fixed");
+                    $("#btn_toggle").on("click", function () {
                         wiki_toc.toc_toggle();
                     });
                 }
@@ -243,14 +243,14 @@ var wiki_toc=
             this.init_toc_chapter_listing();
             util.debug("Initialising wiki_toc()...3");
 
-            if (db.get_wikitoc_on_lhs() == null)
+            if (db.get_wikitoc_on_lhs() === null)
             {
                 //initialise wikitoc on lhs for new sites to be LHS
                 db.set_wikitoc_on_lhs(true);
             }
             util.debug("Initialising wiki_toc()...4");
 
-            if (db.get_wikitoc_on_lhs() == true)
+            if (db.get_wikitoc_on_lhs() === true)
             {
                 var that = this;
                 setTimeout( function() {
@@ -258,7 +258,7 @@ var wiki_toc=
                 }, 20);
             }
             util.debug("Initialising wiki_toc()...5");
-            this.init_html_buttons();
+            //this.init_html_buttons();
             util.debug("Initialising wiki_toc()...6");
             this.init_events();
             util.debug("Initialising wiki_toc() is done!");
@@ -275,14 +275,14 @@ var wiki_toc=
         this.event_add(window,'scroll','event_page_scroll',this.o);
         this.event_page_scroll();
         
-        var toctoggle = document.getElementById("toctoggle");
-        this.event_add(toctoggle,'click','toc_toggle',this.o);
+        //var btn_toggle = document.getElementById("btn_toggle");
+        //this.event_add(btn_toggle,'click','toc_toggle',this.o);
 
-        var toc_enable = document.getElementById("toc_enable");
-        this.event_add(toc_enable,'click','toc_open',this.o);
+        //var toc_enable = document.getElementById("toc_enable");
+        //this.event_add(toc_enable,'click','toc_open',this.o);
         
-        var toc_disable = document.getElementById("toc_disable");
-        this.event_add(toc_disable,'click','toc_close',this.o);
+        //var toc_disable = document.getElementById("toc_disable");
+        //this.event_add(toc_disable,'click','toc_close',this.o);
 
         this.event_add(window,'resize','toc_open',this.o);
     },
@@ -389,7 +389,7 @@ var wiki_toc=
     toc_toggle:function()
     {
         util.debug("toc_toggle()");
-        if (db.get_wikitoc_on_lhs() == true)
+        if (db.get_wikitoc_on_lhs() === true)
         {
             util.debug("going to move TOC to right");
             this.toc_close();
@@ -409,7 +409,7 @@ var wiki_toc=
         
         var toc_height = window.innerHeight.toString() + "px";
         var toc_width = db.get_wikitoc_margin_position(); 
-        if (toc_width == null)
+        if (toc_width === null)
         {
             //toc_width = $("#toc").css('width');
             toc_width = $("#p-namespaces")[0].getBoundingClientRect().left ;
@@ -506,7 +506,7 @@ var wiki_toc=
         */
 
         var toc_table_ul = document.getElementById("lhs_toc");
-        if (toc_table_ul == null)
+        if (toc_table_ul === null)
         {
             return;
         }
@@ -519,7 +519,7 @@ var wiki_toc=
             {
                 var section_tmp = anchor_links[index].getAttribute("href");
                 section_tmp = section_tmp.substring(1); //strip away leading # from a href
-                if (section_tmp == current_section)
+                if (section_tmp === current_section)
                 {
                     //Found the right section, now <highlight> the text of this section
                     
@@ -634,14 +634,14 @@ self.port.on("refresh_wes", function(json_string) {
     util.debug("refresh_wes(): " + json_string);
     util.debug("refresh_wes(): wikitoc on lhs?" + json_obj.is_wikitoc_on_lhs);
 
-    if (json_obj.is_wikitoc_on_lhs == true )
+    if (json_obj.is_wikitoc_on_lhs === true )
     {
         $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
         db.set_wikitoc_margin_position(json_obj.wikitoc_margin_position);
         wiki_toc.toc_open();
         util.debug("refresh_wes(): lets set wikitoc on LHS ");
     }
-    else if (json_obj.is_wikitoc_on_lhs == false)
+    else if (json_obj.is_wikitoc_on_lhs === false)
     {
         wiki_toc.toc_open();
         util.debug("refresh_wes(): lets toggle right");
@@ -660,10 +660,10 @@ self.port.on("refresh_wes", function(json_string) {
 
 
 self.port.on("init_wes", function(json_string) {
-    if ($("#toc").length == 0 ||  
-        $("#left-navigation").length == 0 || 
-        $("#content").length == 0 || 
-        $("#toctitle").length == 0 ) 
+    if ($("#toc").length === 0 ||  
+        $("#left-navigation").length === 0 || 
+        $("#content").length === 0 || 
+        $("#toctitle").length === 0 ) 
     {
         util.debug("wiki_toc() is not going to run as this is not a wiki page with a toc");
         return;
