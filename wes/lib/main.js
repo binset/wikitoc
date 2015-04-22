@@ -10,14 +10,14 @@ let pageWorkers = require("sdk/page-worker");
 //let workers = require("sdk/content/worker");
 var panels = require("sdk/panel");
 
-var production = true;
+var production = false;
 var util = 
 {
     debug:function(debug_string)
     {
         if (production !== true )
         {
-            console.log("_________main.js: " + debug_string);
+            console.log("___main.js: " + debug_string);
         }
     },
 }
@@ -68,26 +68,23 @@ init()
 //tabs.open("https://en.wikipedia.org/wiki/Telephone_number");
 
 tabs.on('activate', function () {
-    if (/wikipedia/.test(tabs.activeTab.url))
+    util.debug('active: ' + tabs.activeTab.url);
+    var json_obj = 
     {
-        util.debug('active: ' + tabs.activeTab.url);
-        var json_obj = 
-        {
-            "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
-            "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
-            "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
-        };
-        var json_string = JSON.stringify(json_obj);
-        util.debug('active: ' + json_string);
-        var worker = null;
-        worker = getActiveWorker();
-        if (worker)
-        {
-            worker.port.emit("refresh_wes", json_string);
-        } else
-        {
-            util.debug("I can't find your worker mate");
-        }
+        "is_wes_enabled": localStorage.getItem("is_wes_enabled"),
+        "is_wikitoc_on_lhs": localStorage.getItem("is_wikitoc_on_lhs"),
+        "wikitoc_margin_position": localStorage.getItem("wikitoc_margin_position"),
+    };
+    var json_string = JSON.stringify(json_obj);
+    util.debug('active: ' + json_string);
+    var worker = null;
+    worker = getActiveWorker();
+    if (worker)
+    {
+        worker.port.emit("refresh_wes", json_string);
+    } else
+    {
+        util.debug("I can't find your worker mate");
     }
 });
  
