@@ -10,7 +10,7 @@ let pageWorkers = require("sdk/page-worker");
 //let workers = require("sdk/content/worker");
 var panels = require("sdk/panel");
 
-var production = false;
+var production = true;
 var util = 
 {
     debug:function(debug_string)

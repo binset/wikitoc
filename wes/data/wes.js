@@ -23,7 +23,7 @@
     It also retains the ability for the user to jump to different sections on the TOC by clicking on the links.
 */
 
-var production = false;
+var production = true;
 
 var db = 
 {
