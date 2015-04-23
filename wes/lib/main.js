@@ -99,6 +99,7 @@ pageMod.PageMod({
         self.data.url("vendor/jqueryui/1.8/jquery-ui.js"),
         self.data.url("vendor/jquery.sidebar.js"),
         self.data.url("wes.js"),
+        self.data.url("wes_keyboard.js"),
     ],
     contentStyleFile: [
         self.data.url("vendor/jqueryui/1.8/themes/base/jquery-ui.css"),

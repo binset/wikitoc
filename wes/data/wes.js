@@ -1,22 +1,3 @@
-// ==UserScript==
-// @name        Wikipedia TOC Enhanced
-// @author      teamrc
-// @namespace   https://github.com/teamrc/wikitoc
-// @homepage    http://teamrc.github.io/wikitoc/
-// @license     GNU GPL version 3.0
-// @description Table of Contents Enhancer for Wikipedia
-// @require     http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
-// @require     http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js
-// @resource    jqUI_CSS  http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css
-// @grant       GM_addStyle
-// @grant       GM_getResourceText
-// @grant       GM_getValue
-// @grant       GM_setValue
-// @version     1
-// @compatible  Greasemonkey
-// ==/UserScript==
-
-
 /** Wiki TOC Enhancer - Users' Guide
     This is a Greasemonkey user script that enhances the TOC(Table of Content) on wikipedia.org.
     It moves the TOC to the left hand side panel, and highlights the current section that the reader is on.
