@@ -75,16 +75,19 @@ function process_keycode(keycode)
     }
 };
 
-jQuery(document).bind('keydown', function (event)
+if (util.is_valid_wiki_page())
 {
-    var key = event.keyCode || event.which;
-
-    if(event.target.type !== 'textarea')
+    jQuery(document).bind('keydown', function (event)
     {
-        if (event.target.type !== 'text') 
+        var key = event.keyCode || event.which;
+
+        if(event.target.type !== 'textarea')
         {
-            //Not in a textarea or textbox
-            process_keycode(key);
+            if (event.target.type !== 'text') 
+            {
+                //Not in a textarea or textbox
+                process_keycode(key);
+            }
         }
-    }
-});
+    });
+}

@@ -61,11 +61,15 @@ function init() {
     if (is_wikitoc_on_lhs == undefined || is_wikitoc_on_lhs == null) {
         localStorage.setItem("is_wikitoc_on_lhs", true);
     } 
+
+    if (production != true)
+    {
+        tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
+        tabs.open("https://en.wikipedia.org/wiki/Telephone_number");
+    }
 }
 init()
 
-//tabs.open("https://en.wikipedia.org/wiki/Telephone_numbers_in_Australia");
-//tabs.open("https://en.wikipedia.org/wiki/Telephone_number");
 
 tabs.on('activate', function () {
     util.debug('active: ' + tabs.activeTab.url);
@@ -98,6 +102,7 @@ pageMod.PageMod({
         self.data.url("vendor/jquery/1.7.2/jquery-1.7.2.js"),
         self.data.url("vendor/jqueryui/1.8/jquery-ui.js"),
         self.data.url("vendor/jquery.sidebar.js"),
+        self.data.url("wes_base.js"),
         self.data.url("wes.js"),
         self.data.url("wes_keyboard.js"),
     ],
