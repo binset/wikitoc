@@ -122,59 +122,7 @@ var wiki_toc=
             if ($("#lhs_toc").length === 0)
             {
                 //lhs_toc doesn't exist, we can recreate it
-
-                var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
-                cloned_toc.addClass("toc");
-                cloned_toc.addClass("mw-body-content");
-                cloned_toc.find('.toctoggle').remove();
-                cloned_toc.insertAfter("#p-lang");
-
-                var that = this;
-                $('#lhs_toc').resizable({
-                  handles: "e",
-                  stop: function(e, ui){
-                      that.event_update_content_margin();
-                    },
-                });
-                $("#lhs_toc").removeClass("toc");
-                $("#lhs_toc").addClass("sidebar left");
-                $("#lhs_toc").sidebar({speed: 1});
-                $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
-
-
-                {
-                    //toggle button
-                    var btn_toggle = document.createElement('button');
-                    btn_toggle.setAttribute("id", "btn_toggle");
-                    var htmltext = document.createTextNode("Toggle Table of Contents");
-                    btn_toggle.appendChild(htmltext);
-
-                    var btn_div = document.createElement('div');
-                    btn_div.setAttribute("id", "btn_div");
-                    btn_div.appendChild(btn_toggle);
-                    $("#lhs_toc")[0].appendChild(btn_div);
-
-
-                    $("#btn_toggle").button({
-                        icons: {
-                            primary: "ui-icon ui-icon-transferthick-e-w",
-                        },  
-                        text: false
-                    })
-                    $("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
-                    $("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
-                    $("#btn_toggle>span").css("transform", "scale(1.5)"); 
-
-                    $("#btn_div").css("left", db.get_wikitoc_margin_position());
-                    $("#btn_div").css("position", "relative");
-
-                    $("#btn_toggle").css("font-size", "0.7em");
-                    $("#btn_toggle").css("bottom", "20px");
-                    $("#btn_toggle").css("position", "fixed");
-                    $("#btn_toggle").on("click", function () {
-                        wiki_toc.toc_toggle();
-                    });
-                }
+                this.init_lhs_toc();
             }
 
             util.debug("Initialising wiki_toc()...1");
@@ -207,6 +155,71 @@ var wiki_toc=
             util.debug("wiki_toc() is not running");
         }
         
+    },
+
+    init_lhs_toc:function()
+    {
+        var cloned_toc = $("#toc").clone().attr('id', 'lhs_toc');
+        cloned_toc.addClass("toc");
+        cloned_toc.addClass("mw-body-content");
+        cloned_toc.find('.toctoggle').remove();
+        cloned_toc.insertAfter("#p-lang");
+
+        var that = this;
+        $('#lhs_toc').resizable({
+          handles: "e",
+          stop: function(e, ui){
+              that.event_update_content_margin();
+            },
+        });
+        $("#lhs_toc").removeClass("toc");
+        $("#lhs_toc").addClass("sidebar left");
+        $("#lhs_toc").sidebar({speed: 1});
+        $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
+
+
+        {
+            //make chapters focusable by introducing tabindex="1" to all <a href> under <div id="lhs_toc><ul>
+            ahrefs = $('#lhs_toc ul a');
+            for (var i=0; i<ahrefs.length; i++)
+            {
+                ahrefs[i].setAttribute("tabindex", "1");
+            }
+        }
+
+        {
+            //toggle button
+            var btn_toggle = document.createElement('button');
+            btn_toggle.setAttribute("id", "btn_toggle");
+            var htmltext = document.createTextNode("Toggle Table of Contents");
+            btn_toggle.appendChild(htmltext);
+
+            var btn_div = document.createElement('div');
+            btn_div.setAttribute("id", "btn_div");
+            btn_div.appendChild(btn_toggle);
+            $("#lhs_toc")[0].appendChild(btn_div);
+
+
+            $("#btn_toggle").button({
+                icons: {
+                    primary: "ui-icon ui-icon-transferthick-e-w",
+                },  
+                text: false
+            })
+            $("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
+            $("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
+            $("#btn_toggle>span").css("transform", "scale(1.5)"); 
+
+            $("#btn_div").css("left", db.get_wikitoc_margin_position());
+            $("#btn_div").css("position", "relative");
+
+            $("#btn_toggle").css("font-size", "0.7em");
+            $("#btn_toggle").css("bottom", "20px");
+            $("#btn_toggle").css("position", "fixed");
+            $("#btn_toggle").on("click", function () {
+                wiki_toc.toc_toggle();
+            });
+        }
     },
     
     init_events:function()
@@ -467,6 +480,7 @@ var wiki_toc=
                     new_element.setAttribute('style','background-color: #FFFF00');
                     anchor_links[index].lastChild.textContent = "";
                     anchor_links[index].lastChild.appendChild(new_element);
+                    anchor_links[index].focus(); //try to hover/focus this element
                     
                 } else 
                 {
