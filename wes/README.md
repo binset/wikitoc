@@ -37,6 +37,7 @@ Release History:
 * 2015/04/22 - Version 1.2 released - fixed issue with incorrect sidebar behaviour (Thanks to supaiku)
 * 2015/04/22 - Version 1.3 released - fixed CSS and refresh wikitoc action
 * 2015/04/23 - Version 1.4 released - added keyboard support (Thanks to Fledo for the suggestion)
+* 2015/04/28 - Version 1.5 released - added suppport for TOC autoscrolling (Thanks to IllogicalFool for the suggestion)
 
 Author(s):
 ----------
