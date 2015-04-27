@@ -178,14 +178,6 @@ var wiki_toc=
         $("#lhs_toc").css("width", db.get_wikitoc_margin_position());
 
 
-        {
-            //make chapters focusable by introducing tabindex="1" to all <a href> under <div id="lhs_toc><ul>
-            ahrefs = $('#lhs_toc ul a');
-            for (var i=0; i<ahrefs.length; i++)
-            {
-                ahrefs[i].setAttribute("tabindex", "1");
-            }
-        }
 
         {
             //toggle button
@@ -480,7 +472,10 @@ var wiki_toc=
                     new_element.setAttribute('style','background-color: #FFFF00');
                     anchor_links[index].lastChild.textContent = "";
                     anchor_links[index].lastChild.appendChild(new_element);
-                    anchor_links[index].focus(); //try to hover/focus this element
+
+                    //anchor_links[index].focus(); //try to hover/focus this element
+                    jquery_selector = "#lhs_toc a[href='#" + section_tmp + "']";
+                    $(jquery_selector).scrollintoview({ duration: 8 });
                     
                 } else 
                 {

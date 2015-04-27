@@ -59,6 +59,6 @@ var util =
 
         return is_valid;
     },
-
+    
 };
 

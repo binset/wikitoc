@@ -102,6 +102,7 @@ pageMod.PageMod({
         self.data.url("vendor/jquery/1.7.2/jquery-1.7.2.js"),
         self.data.url("vendor/jqueryui/1.8/jquery-ui.js"),
         self.data.url("vendor/jquery.sidebar.js"),
+        self.data.url("vendor/jquery.scrollintoview.js"),
         self.data.url("wes_base.js"),
         self.data.url("wes.js"),
         self.data.url("wes_keyboard.js"),
