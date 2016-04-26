@@ -16,10 +16,11 @@
     //"default_popup": "src/browser_action/browser_action.html"
 	"default_title": "Make this page red"
   },
-//  "permissions": [
-//    "https://*.wikipedia.org/wiki/*",
-//	"activeTab"
-//  ],
+  "permissions": [
+    "https://*.wikipedia.org/wiki/*",
+	"activeTab",
+	"storage"
+  ],
 //  "background": {
 //    "scripts": ["background.js"],
 //    "persistent": false
@@ -28,13 +29,15 @@
     {
       "matches": [        "https://*.wikipedia.org/wiki/*"      ],
       "css": [
-		"js/jqueryui/jquery-ui.css",
-		"src/inject/inject.css"      
+		//"js/jqueryui/jquery-ui.css",
+		//"src/inject/inject.css"      
 	  ],
 	  "js": [ 
-		"js/jquery/jquery.js",
-		"js/jqueryui/jquery-ui.js",
-        "src/inject/inject.js"      
+	    "js/bower_components/jquery/dist/jquery.js",
+		"js/bower_components/jquery-ui/jquery-ui.js",
+		//"js/bower_components/angular/dist/angular.js",
+		"js/lhstoc/lhstoc.js",
+        "src/inject/inject.js"
 	  ]
     }
   ]
