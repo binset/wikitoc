@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link href="demo.css" rel="stylesheet">
+<script src="./src/jquery.sidebar.js"></script>
+  <script>
+  $(function() {
+    $( "#sidebar_left" ).resizable();
+  });
+  </script>
+</head>
+<body>
+ 
+<div class="container" align="center">
+<a href="#" class="btn btn-primary" data-action="toggle" data-side="left">Toggle Left</a>
+</div>
+ 
+<div class="sidebars">
+<div class="sidebar left" id="sidebar_left">Left</div>
+</div>
+
+</body>
+</html>
