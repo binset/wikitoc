@@ -29,10 +29,9 @@
     {
       "matches": [        "https://*.wikipedia.org/wiki/*"      ],
       "css": [
-	    "js/bower_components/jquery-sidebar/jquery.sidebar.css",
-		//"js/jqueryui/jquery-ui.css",
-		"js/bower_components/jquery-ui/themes/smoothness/jquery-ui.css",
-		"src/inject/inject.css"      
+	    //"js/bower_components/jquery-sidebar/jquery.sidebar.css",
+		//"js/bower_components/jquery-ui/themes/smoothness/jquery-ui.css",
+		"src/inject/inject.css"
 	  ],
 	  "js": [ 
 	    "js/bower_components/jquery/dist/jquery.js",
@@ -41,12 +40,6 @@
 		//"js/bower_components/angular/dist/angular.js",
 		"js/lhstoc/lhstoc.js",
         "src/inject/inject.js"
-	  ],
-	  "web_accessible_resources": [
-	    "js/bower_components/jquery-sidebar/jquery.sidebar.css",
-		//"js/jqueryui/jquery-ui.css",
-		"js/bower_components/jquery-ui/themes/smoothness/jquery-ui.css",
-		"src/inject/inject.css"      
 	  ]
     }
   ]

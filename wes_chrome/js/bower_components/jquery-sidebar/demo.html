@@ -1,44 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <link href="demo.css" rel="stylesheet">
-        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
-		<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <script src="./src/jquery.sidebar.js"></script>
-        <script src="demo.js"></script>
-    </head>
-    <body>
-        <div class="container" align="center">
-            <h1>jQuery Sidebar Demo</h3>
-            <h3>Toggle sidebars</h3>
-            <div>
-                <a href="#" class="btn btn-primary" data-action="toggle" data-side="left"><span>Toggle Left</span></a>
-                <a href="#" class="btn btn-primary" data-action="toggle" data-side="top"><span>Toggle Top</span></a>
-                <a href="#" class="btn btn-primary" data-action="toggle" data-side="right"><span>Toggle Right</span></a>
-                <a href="#" class="btn btn-primary" data-action="toggle" data-side="bottom"><span>Toggle Bottom</span></a>
-            </div>
+<head>
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link href="demo.css" rel="stylesheet">
+<script src="./src/jquery.sidebar.js"></script>
 
-            <h3>Open sidebars</h3>
-            <section class="example-buttons" class="clearfix">
-                <a href="#" class="btn btn-success" data-action="open" data-side="left"><span>Open Left</span></a>
-                <a href="#" class="btn btn-success" data-action="open" data-side="top"><span>Open Top</span></a>
-                <a href="#" class="btn btn-success" data-action="open" data-side="right"><span>Open Right</span></a>
-                <a href="#" class="btn btn-success" data-action="open" data-side="bottom"><span>Open Bottom</span></a>
-            </section>
+<script> 
+$(document).ready(function () {
+	$(".sidebar.left").sidebar({side: "left"});
+	$(".sidebar.left").trigger("sidebar:open");
+	$(".sidebar.left").resizable({handles: "e, w"});
 
-            <h3>Close sidebars</h3>
-            <section class="example-buttons" class="clearfix">
-                <a href="#" class="btn btn-danger" data-action="close" data-side="left"><span>Close Left</span></a>
-                <a href="#" class="btn btn-danger" data-action="close" data-side="top"><span>Close Top</span></a>
-                <a href="#" class="btn btn-danger" data-action="close" data-side="right"><span>Close Right</span></a>
-                <a href="#" class="btn btn-danger" data-action="close" data-side="bottom"><span>Close Bottom</span></a>
-            </section>
-        </div>
-        <div class="sidebars">
-            <div class="sidebar left" id="sidebar_left">Left</div>
-            <div class="sidebar right" id="sidebar_right">Right</div>
-            <div class="sidebar top" id="sidebar_top">Top</div>
-            <div class="sidebar bottom" id="sidebar_bottom">Bottom</div>
-        </div>
-    </body>
+    $(".btn").on("click", function () {
+        $("#sidebar_left").trigger("sidebar:toggle");
+        return false;
+    });
+});
+</script> 
+</head>
+<body>
+
+<div class="container" align="center">
+<a href="#" class="btn btn-primary" data-action="toggle" data-side="left">Toggle Left</a>
+</div>
+
+
+<div class="sidebar left ui-resizable-w" id="sidebar_left">Left</div>
+<div class="sidebars">
+</div>
+
+</body>
 </html>

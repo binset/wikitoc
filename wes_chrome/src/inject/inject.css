@@ -1,6 +1,51 @@
 /**
  * Place your custom CSS styles here.
  **/
-#toc {
-color: white;
+
+/*
+* {
+    color: red;
+}
+*/
+
+#sidebar_left {
+    position: fixed;
+    width: 270px;
+    background: #448AFF;
+}
+
+#lhstoc.sidebar.left {
+    width: 161px;
+	overflow: scroll;
+	height: 100% ;
+    /*background: #A7D7F9;
+    background: #FFFFFF;*/
+}
+
+#lhstoc.sidebar.right {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 270px;
+    background: #448AFF;
+}
+
+#lhstoc.sidebar.bottom {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 270px;
+    background: #03A9F4;
+}
+
+#lhstoc.sidebar.top {
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 270px;
+    background: #03A9F4;
+}
+
+#lhstoc.sidebar {
+    position: fixed;
 }

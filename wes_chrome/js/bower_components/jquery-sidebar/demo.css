@@ -1,3 +1,8 @@
+
+* {
+    color: red;
+}
+
 .sidebar.left {
     position: fixed;
     top: 0;
@@ -5,30 +10,6 @@
     bottom: 0;
     width: 270px;
     background: #448AFF;
-}
-
-.sidebar.right {
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: 270px;
-    background: #448AFF;
-}
-
-.sidebar.bottom {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 270px;
-    background: #03A9F4;
-}
-
-.sidebar.top {
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 270px;
-    background: #03A9F4;
 }
 
 .sidebars > .sidebar {

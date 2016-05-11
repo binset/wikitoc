@@ -4,7 +4,7 @@
     bottom: 0 !important;
     width: 161px;
 	overflow: scroll;
-	height: 199px !important;
+	height: 100% !important;
     /*background: #A7D7F9;
     background: #FFFFFF;*/
 }
