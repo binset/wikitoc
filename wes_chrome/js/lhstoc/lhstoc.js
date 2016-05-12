@@ -87,12 +87,6 @@ var lhstoc=
 		$("#lhstoc ul").css("display", ""); //show the ul in case it is already hidden
 		$("#lhstoc #toctitle").remove();
 
-
-        //var toc_height = window.innerHeight.toString() + "px";
-        //var toc_width = $("#lhstoc").css("width");
-        //toc_width = $("#left-navigation").css('margin-left');
-        //var lhs_toc_position = 0;
-
         $("#lhstoc").addClass("sidebar");
         $("#lhstoc").addClass("left");
         $("#lhstoc").addClass("ui-resizable-w");
@@ -108,29 +102,28 @@ var lhstoc=
 
     init_lhstoc_button:function()
 	{
-		//toggle button
+		//#btn_toggle
 		var btn_toggle = document.createElement('button');
 		btn_toggle.setAttribute("id", "btn_toggle");
 		var htmltext = document.createTextNode("Toggle Table of Contents");
 		btn_toggle.appendChild(htmltext);
-
-		var btn_div = document.createElement('div');
-		btn_div.setAttribute("id", "btn_div");
-		btn_div.appendChild(btn_toggle);
-		$("#mw-navigation")[0].appendChild(btn_div);
-
-		$("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
-		$("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
-		$("#btn_toggle>span").css("transform", "scale(1.5)"); 
-
-		$("#btn_div").css("position", "relative");
-		//$("#btn_div").css("left", db.get_wikitoc_margin_position());
-
 		$("#btn_toggle").css("font-size", "0.7em");
 		$("#btn_toggle").css("bottom", "20px");
 		$("#btn_toggle").css("position", "fixed");
 		$("#btn_toggle").css("z-index", "10");
 		$("#btn_toggle").on("click", this.lhstoc_toggle);
+
+		$("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
+		$("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
+		$("#btn_toggle>span").css("transform", "scale(1.5)"); 
+
+		//#btn_divv
+		var btn_div = document.createElement('div');
+		btn_div.setAttribute("id", "btn_div");
+		btn_div.appendChild(btn_toggle);
+		$("#btn_div").css("position", "relative");
+
+		$("#mw-navigation")[0].appendChild(btn_div);
     },
 
 	lhstoc_toggle:function(o) 
