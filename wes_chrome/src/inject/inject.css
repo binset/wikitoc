@@ -49,3 +49,11 @@
 #lhstoc.sidebar {
     position: fixed;
 }
+
+#btn_toggle {
+	font-size: 0.7em;
+	bottom: 20px;
+	position: fixed;
+	z-index: 10;
+	left: 0;
+}

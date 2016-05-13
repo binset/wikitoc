@@ -84,7 +84,6 @@ var lhstoc=
         cloned_toc.addClass("mw-body-content");
         cloned_toc.find('.toctoggle').remove();
         cloned_toc.insertAfter("#p-lang");
-		$("#lhstoc ul").css("display", ""); //show the ul in case it is already hidden
 		$("#lhstoc #toctitle").remove();
 
         $("#lhstoc").addClass("sidebar");
@@ -121,10 +120,6 @@ var lhstoc=
 
 		$("#btn_div").css("position", "relative");
 
-		$("#btn_toggle").css("font-size", "0.7em");
-		$("#btn_toggle").css("bottom", "20px");
-		$("#btn_toggle").css("position", "fixed");
-		$("#btn_toggle").css("z-index", "10");
 		$("#btn_toggle").on("click", this.lhstoc_toggle);
     },
 
@@ -224,9 +219,9 @@ var lhstoc=
 			if (item["lhstoc_on_lhs"] === true)
 			{
 				var lhstoc_width = parseInt($("#lhstoc").css('width'));
-				$("#left-navigation").css('margin-left', lhstoc_width + "px");
-				$("#content").css('margin-left', lhstoc_width + "px" );
-				$("#footer").css('margin-left', lhstoc_width + "px" );
+				$("#left-navigation").css('margin-left', lhstoc_width);
+				$("#content").css('margin-left', lhstoc_width);
+				$("#footer").css('margin-left', lhstoc_width);
 				$("#btn_div").css("left", lhstoc_width);
 				$("#btn_div").css("position", "relative");
 
