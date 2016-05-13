@@ -96,6 +96,7 @@ var lhstoc=
           handles: "e",
           stop: function(e, ui){
               console.log("lhstoc resized");
+			  lhstoc.event_update_content_margin();
             },
         });
 	},
@@ -212,5 +213,25 @@ var lhstoc=
 			}
 		});
 	},
+
+    event_update_content_margin:function()
+    {
+        /** based on the width of lhstoc, update the position of the main CONTENTS margin to follow that of the lhstoc */
+        
+        util.debug("|||||||event_update_content_margin()");
+		chrome.storage.sync.get("lhstoc_on_lhs", function(item){
+			if (item["lhstoc_on_lhs"] === true)
+			{
+				var lhstoc_width = parseInt($("#lhstoc").css('width'));
+				$("#left-navigation").css('margin-left', lhstoc_width + "px");
+				$("#content").css('margin-left', lhstoc_width + "px" );
+				$("#footer").css('margin-left', lhstoc_width + "px" );
+				$("#btn_div").css("left", lhstoc_width);
+				$("#btn_div").css("position", "relative");
+
+				chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
+			}
+		});
+    },
 };
 console.log("lhstoc.js");
