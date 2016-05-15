@@ -85,11 +85,12 @@ var lhstoc=
         cloned_toc.find('.toctoggle').remove();
         cloned_toc.insertAfter("#p-lang");
 		$("#lhstoc #toctitle").remove();
+		$("#lhstoc ul").css("display", ""); //restore #lhstoc just in case it's hidden
 
         $("#lhstoc").addClass("sidebar");
         $("#lhstoc").addClass("left");
         $("#lhstoc").addClass("ui-resizable-w");
-        $("#lhstoc").sidebar({side: "left"});
+        $("#lhstoc").sidebar({side: "left"}); 
 
         $('#lhstoc').resizable({
           handles: "e",
@@ -108,7 +109,7 @@ var lhstoc=
 		var htmltext = document.createTextNode("Toggle Table of Contents");
 		btn_toggle.appendChild(htmltext);
 
-		//#btn_divv
+		//#btn_div
 		var btn_div = document.createElement('div');
 		btn_div.setAttribute("id", "btn_div");
 		btn_div.appendChild(btn_toggle);
@@ -155,21 +156,6 @@ var lhstoc=
 		$("#lhstoc").trigger("sidebar:close");
 	},
 
-    test_db:function()
-	{
-		this.o.events = {}; //stores hash of event handlers
-
-		//{ "lhstoc_enabled", "lhstoc_on_lhs", "lhstoc_margin" }
-		chrome.storage.sync.set({"lhstoc_enabled": 1, "hh": 2});
-		chrome.storage.sync.get( null , function (items) {
-			for (var key in items) {
-				util.debug(key + ": " + items[key]);
-			}
-			//lhstoc.init_lhstoc();
-			//lhstoc.init_html_buttons();
-		});
-	},
-
     init:function()
 	{
 		util.inject_css("https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css");
@@ -191,12 +177,13 @@ var lhstoc=
 			if ("lhstoc_margin" in items)
 				lhstoc_margin =  items["lhstoc_margin"];
 
-			util.debug(lhstoc_on_lhs);
+			util.debug("margin" + lhstoc_margin);
 			if (lhstoc_enabled === true)
 			{
 				$( document ).ready(function() {
 					lhstoc.init_lhstoc();
 					lhstoc.init_lhstoc_button();
+					lhstoc.event_update_content_margin();
 					if (lhstoc_on_lhs === true)
 					{
 						lhstoc.lhstoc_show();
@@ -215,10 +202,11 @@ var lhstoc=
         /** based on the width of lhstoc, update the position of the main CONTENTS margin to follow that of the lhstoc */
         
         util.debug("|||||||event_update_content_margin()");
-		chrome.storage.sync.get("lhstoc_on_lhs", function(item){
+		chrome.storage.sync.get(null, function(item){
 			if (item["lhstoc_on_lhs"] === true)
 			{
 				var lhstoc_width = parseInt($("#lhstoc").css('width'));
+				lhstoc_width += 15; //magic css number
 				$("#left-navigation").css('margin-left', lhstoc_width);
 				$("#content").css('margin-left', lhstoc_width);
 				$("#footer").css('margin-left', lhstoc_width);
