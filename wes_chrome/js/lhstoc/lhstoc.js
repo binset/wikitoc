@@ -87,18 +87,28 @@ var lhstoc=
 		$("#lhstoc #toctitle").remove();
 		$("#lhstoc ul").css("display", ""); //restore #lhstoc just in case it's hidden
 
-        $("#lhstoc").addClass("sidebar");
-        $("#lhstoc").addClass("left");
-        $("#lhstoc").addClass("ui-resizable-w");
-        $("#lhstoc").sidebar({side: "left"}); 
+        //$("#lhstoc").addClass("ui-resizable");
+        $("#lhstoc").addClass("ui-resizable-e");
 
+        $('#toc').resizable({
+			handles: "e",
+        });
+		var that = this;
         $('#lhstoc').resizable({
-          handles: "e",
+			handles: "e",
           stop: function(e, ui){
               console.log("lhstoc resized");
-			  lhstoc.event_update_content_margin();
+			  that.event_update_content_margin();
             },
         });
+
+        $("#lhstoc").addClass("sidebar");
+        $("#lhstoc").addClass("left");
+        $("#lhstoc").sidebar({side: "left"}); 
+
+		//var toc_height = window.innerHeight.toString() + "px";
+        //$("#lhstoc").css("height",  toc_height);
+
 	},
 
     init_lhstoc_button:function()
@@ -124,20 +134,27 @@ var lhstoc=
 		$("#btn_toggle").on("click", this.lhstoc_toggle);
     },
 
+    init_lhstoc_margin:function(margin)
+	{
+		util.debug("margin:" + margin);
+		$("#lhstoc").css("width", margin);
+	},
+
 	lhstoc_toggle:function(o) 
 	{
 		util.debug("lhstoc_toggle()");
 		$("#lhstoc").trigger("sidebar:toggle");
+		var that = this;
 		chrome.storage.sync.get("lhstoc_on_lhs", function(item){
 			if (item["lhstoc_on_lhs"] === true)
 			{
 				util.debug("lhstoc on lhs");
-				lhstoc.lhstoc_hide();
+				that.lhstoc_hide();
 			}
 			else
 			{
 				util.debug("lhstoc NOT on lhs");
-				lhstoc.lhstoc_show();
+				that.lhstoc_show();
 			}
 		});
 	},
@@ -158,6 +175,7 @@ var lhstoc=
 
     init:function()
 	{
+		var that = this;
 		util.inject_css("https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css");
 
 		this.o.events = {}; //stores hash of event handlers
@@ -181,16 +199,17 @@ var lhstoc=
 			if (lhstoc_enabled === true)
 			{
 				$( document ).ready(function() {
-					lhstoc.init_lhstoc();
-					lhstoc.init_lhstoc_button();
-					lhstoc.event_update_content_margin();
+					that.init_lhstoc();
+					that.init_lhstoc_button();
+					that.init_lhstoc_margin(lhstoc_margin);
+					that.event_update_content_margin();
 					if (lhstoc_on_lhs === true)
 					{
-						lhstoc.lhstoc_show();
+						that.lhstoc_show();
 					}
 					else
 					{
-						lhstoc.lhstoc_hide();
+						that.lhstoc_hide();
 					}
 				});
 			}

@@ -8,15 +8,8 @@
 }
 */
 
-#sidebar_left {
-    position: fixed;
-    width: 270px;
-    background: #448AFF;
-}
-
 #lhstoc.sidebar.left {
     width: 161px;
-	overflow: scroll;
 	height: 100% ;
     /*background: #A7D7F9;
     background: #FFFFFF;*/
@@ -48,6 +41,11 @@
 
 #lhstoc.sidebar {
     position: fixed;
+}
+#lhstoc{
+	overflow: scroll;
+	overflow-x: hidden;
+	display: block;
 }
 
 #btn_toggle {
