@@ -129,7 +129,6 @@ var lhstoc=
 		$("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
 		$("#btn_toggle>span").css("transform", "scale(1.5)"); 
 
-		$("#btn_div").css("position", "relative");
 
 		$("#btn_toggle").on("click", this.lhstoc_toggle);
     },
@@ -229,8 +228,9 @@ var lhstoc=
 				$("#left-navigation").css('margin-left', lhstoc_width);
 				$("#content").css('margin-left', lhstoc_width);
 				$("#footer").css('margin-left', lhstoc_width);
-				$("#btn_div").css("left", lhstoc_width);
-				$("#btn_div").css("position", "relative");
+				btn_toggle_width = parseInt($("#btn_toggle").css("width"));
+				$("#btn_div").css("left", lhstoc_width-btn_toggle_width-10);
+				//$("#btn_div").css("position", "relative");
 
 				chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
 			}

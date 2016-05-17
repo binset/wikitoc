@@ -43,15 +43,20 @@
     position: fixed;
 }
 #lhstoc{
-	overflow: scroll;
+	overflow: auto;
 	overflow-x: hidden;
 	display: block;
 }
 
+#btn_div {
+	display: block;
+	position: fixed;
+	left: 100;
+}
 #btn_toggle {
+	display: block;
 	font-size: 0.7em;
 	bottom: 20px;
 	position: fixed;
 	z-index: 10;
-	left: 0;
 }
