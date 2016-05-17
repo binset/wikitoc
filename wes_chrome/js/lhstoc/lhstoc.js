@@ -53,6 +53,33 @@ var util =
         return pixels_a - pixels_b;
     },
 
+    wwhs:function()
+    {
+        /** returns:
+                clientWidth
+                clientHeight
+                scrollLeft
+                scrollTop
+        */
+        if (window.innerHeight) 
+            return [window.innerWidth-10,window.innerHeight-10,window.pageXOffset,window.pageYOffset];
+        else if (document.documentElement.clientHeight) 
+            return [document.documentElement.clientWidth-10,document.documentElement.clientHeight-10,document.documentElement.scrollLeft,document.documentElement.scrollTop];
+            
+            return [document.body.clientWidth,document.body.clientHeight,document.body.scrollLeft,document.body.scrollTop];
+    },
+
+    pos:function(obj)
+    {
+        var rtn=[0,0];
+        while(obj)
+        {
+            rtn[0]+=obj.offsetLeft;
+            rtn[1]+=obj.offsetTop;
+            obj=obj.offsetParent;
+        }
+        return rtn;
+    },
 };
 
 var lhstoc=
@@ -139,6 +166,53 @@ var lhstoc=
 		$("#lhstoc").css("width", margin);
 	},
 
+    init_toc_chapter_listing:function()
+    {
+        var div_list=document.getElementsByClassName('mw-headline');
+        var content_listing = [];
+        var chapters_listing = [];
+        var cloned_node;
+        var i = 0;
+        for (i=0; i<div_list.length; i++)
+        {
+            //util.debug(div_list[i].outerHTML);
+            content_listing.push(div_list[i]);
+        }
+        
+        for (i=0; i<content_listing.length; i++)
+        {
+            cloned_node = content_listing[i].cloneNode(true);
+            //obj.appendChild(cloned_node);
+            var anchor_class = content_listing[i].className;
+            var active_class = "";
+            
+            chapters_listing[i]=[
+                content_listing[i],
+                cloned_node,
+                anchor_class,
+                anchor_class+' '+active_class,
+                100 //scrollspeed
+            ];
+            
+            //util.debug("adding: " + content_listing[i].outerHTML );
+        }
+        
+        this.o.chapters_listing = chapters_listing;
+        
+		/*
+        for (i=0; i<chapters_listing.length; i++)
+        {
+            util.debug("verifying: " + chapters_listing[i][1].outerHTML);
+        }
+		*/
+    },
+
+    init_events:function()
+    {
+        this.event_add(window,'scroll','event_page_scroll',this.o);
+        this.event_page_scroll();
+	},
+
 	lhstoc_toggle:function(o) 
 	{
 		util.debug("lhstoc_toggle()");
@@ -201,6 +275,8 @@ var lhstoc=
 					that.init_lhstoc();
 					that.init_lhstoc_button();
 					that.init_lhstoc_margin(lhstoc_margin);
+					that.init_toc_chapter_listing();
+					that.init_events();
 					that.event_update_content_margin();
 					if (lhstoc_on_lhs === true)
 					{
@@ -235,6 +311,106 @@ var lhstoc=
 				chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
 			}
 		});
+    },
+
+    event_page_scroll:function()
+    {
+        /** event that gets called when user scrolls.
+            Hightlights current chapter in the TOC
+        */
+        
+        var nu = 0;
+        var i = 0;
+        for (nu=0,i=0; i < this.o.chapters_listing.length; i++){
+            this.o.chapters_listing[i][1].className=this.o.chapters_listing[i][2];
+            //(this.pos(this.o.chapters_listing[i][0])[1]-this.wwhs()[3]-this.wwhs()[1]/2)<0?nu=i:null;
+            (util.pos(this.o.chapters_listing[i][0])[1]-util.wwhs()[3]-util.wwhs()[1]/100)<0?nu=i:null;
+            
+        }
+        if (nu !== null) {
+            //util.debug("hit paydirt: chapter is " + this.o.chapters_listing[nu][0].outerHTML);
+            this.o.chapters_listing[nu][1].className=this.o.chapters_listing[nu][3];
+            
+            var current_section = this.o.chapters_listing[nu][0].getAttribute("id");
+            this.update_toc(current_section);
+        }
+    },
+    update_toc:function(current_section)
+    {
+        /**given the name of the current_section, update the toc (table of contents) to highlight this section, and also unhighlight any other highlighted sections
+        */
+		util.debug(current_section);
+
+        var toc_table_ul = document.getElementById("lhstoc");
+        if (toc_table_ul === null)
+        {
+            return;
+        }
+        
+        //Given the <ul> of the TOC, find each <a href> and look for current_section
+        var anchor_links = toc_table_ul.getElementsByTagName("a");
+        for (var index in anchor_links) 
+        {
+            try 
+            {
+                var section_tmp = anchor_links[index].getAttribute("href");
+                section_tmp = section_tmp.substring(1); //strip away leading # from a href
+                if (section_tmp === current_section)
+                {
+                    //Found the right section, now <highlight> the text of this section
+                    
+                    var new_element = document.createElement("SPAN");
+                    new_element.textContent = anchor_links[index].lastChild.textContent;
+                    new_element.setAttribute('style','background-color: #FFFF00');
+                    anchor_links[index].lastChild.textContent = "";
+                    anchor_links[index].lastChild.appendChild(new_element);
+
+                    anchor_links[index].focus(); //try to hover/focus this element
+                    anchor_links[index].unfocus(); //try to hover/focus this element
+                    jquery_selector = "#lhstoc a[href='#" + section_tmp + "']";
+                    $(jquery_selector).scrollintoview({ duration: 8 });
+                    
+                } else 
+                {
+                    //Not the  right section, remove any <underline> of this section
+                    
+                    var section_name = anchor_links[index].lastChild.lastChild.textContent;
+                    anchor_links[index].lastChild.removeChild(anchor_links[index].lastChild.lastChild);
+                    anchor_links[index].lastChild.textContent = section_name;
+                }
+            } catch (err)
+            {
+                util.debug("well, you can't quite handle " + anchor_links[index].innerHTML + " " + err);
+            }
+        }
+    },
+
+    event_add:function(event_object, event_name, function_name,p)
+    {
+        /*
+            Docs for EventTarget.addEventListener:
+            target.addEventListener(type, listener[, useCapture]);
+            target.addEventListener(type, listener[, useCapture, wantsUntrusted Non-standard]); // Gecko/Mozilla only
+        */
+        var oop=this;
+        var event_handler;
+        if (event_object.addEventListener){
+            this.o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e);};
+            event_handler = this.o.events[event_object + event_name + function_name];
+
+            event_object.addEventListener(event_name, event_handler, false);
+            util.debug("EVENT: adding event listener:" + event_name + " function_name:" + function_name + " p:" + p);
+        }
+        else if (event_object.attachEvent){
+            this.o.events[event_object + event_name + function_name] = function(e){ return oop[function_name](p,e); };
+            event_handler = this.o.events[event_object + event_name + function_name];
+
+            event_object.attachEvent('on'+event_name, event_handler);
+            util.debug("EVENT: adding attach event :" + event_name + " function_name:" + function_name + " p:" + p);
+        } else 
+        {
+            util.debug("EVENT: unable to add event :" + event_name + " function_name:" + function_name + " p:" + p);
+        }
     },
 };
 console.log("lhstoc.js");

@@ -60,3 +60,7 @@
 	position: fixed;
 	z-index: 10;
 }
+
+input {
+	outline:none;
+}
