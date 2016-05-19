@@ -335,55 +335,40 @@ var lhstoc=
             this.update_toc(current_section);
         }
     },
+
     update_toc:function(current_section)
     {
         /**given the name of the current_section, update the toc (table of contents) to highlight this section, and also unhighlight any other highlighted sections
         */
-		util.debug(current_section);
+        var anchor_links = $("#lhstoc a")
+		for (var index=0; index < anchor_links.length; index++ )
+		{
+			var section_tmp = anchor_links[index].getAttribute("href");
+			section_tmp = section_tmp.substring(1); //strip away leading # from a href
+			if (section_tmp === current_section)
+			{
+				//Found the right section, now <highlight> the text of this section
+				
+				var new_element = document.createElement("SPAN");
+				new_element.textContent = anchor_links[index].lastChild.textContent;
+				new_element.setAttribute('style','background-color: #FFFF00');
+				anchor_links[index].lastChild.textContent = "";
+				anchor_links[index].lastChild.appendChild(new_element);
 
-        var toc_table_ul = document.getElementById("lhstoc");
-        if (toc_table_ul === null)
-        {
-            return;
-        }
-        
-        //Given the <ul> of the TOC, find each <a href> and look for current_section
-        var anchor_links = toc_table_ul.getElementsByTagName("a");
-        for (var index in anchor_links) 
-        {
-            try 
-            {
-                var section_tmp = anchor_links[index].getAttribute("href");
-                section_tmp = section_tmp.substring(1); //strip away leading # from a href
-                if (section_tmp === current_section)
-                {
-                    //Found the right section, now <highlight> the text of this section
-                    
-                    var new_element = document.createElement("SPAN");
-                    new_element.textContent = anchor_links[index].lastChild.textContent;
-                    new_element.setAttribute('style','background-color: #FFFF00');
-                    anchor_links[index].lastChild.textContent = "";
-                    anchor_links[index].lastChild.appendChild(new_element);
-
-                    anchor_links[index].focus(); //try to hover/focus this element
-                    anchor_links[index].unfocus(); //try to hover/focus this element
-                    jquery_selector = "#lhstoc a[href='#" + section_tmp + "']";
-                    $(jquery_selector).scrollintoview({ duration: 8 });
-                    
-                } else 
-                {
-                    //Not the  right section, remove any <underline> of this section
-                    
-                    var section_name = anchor_links[index].lastChild.lastChild.textContent;
-                    anchor_links[index].lastChild.removeChild(anchor_links[index].lastChild.lastChild);
-                    anchor_links[index].lastChild.textContent = section_name;
-                }
-            } catch (err)
-            {
-                util.debug("well, you can't quite handle " + anchor_links[index].innerHTML + " " + err);
-            }
-        }
-    },
+				//anchor_links[index].focus(); //try to hover/focus this element
+				util.debug(section_tmp);
+				jquery_selector = "#lhstoc a[href='#" + section_tmp + "']";
+				$(jquery_selector).scrollintoview({ duration: 8 });
+			} else 
+			{
+				//Not the  right section, remove any <underline> of this section
+				
+				var section_name = anchor_links[index].lastChild.lastChild.textContent;
+				anchor_links[index].lastChild.removeChild(anchor_links[index].lastChild.lastChild);
+				anchor_links[index].lastChild.textContent = section_name;
+			}
+		}
+	},
 
     event_add:function(event_object, event_name, function_name,p)
     {

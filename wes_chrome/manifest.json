@@ -37,6 +37,7 @@
 	    "js/bower_components/jquery/dist/jquery.js",
 		"js/bower_components/jquery-ui/jquery-ui.js",
 		"js/bower_components/jquery-sidebar/src/jquery.sidebar.js",
+		"js/bower_components/jquery.scrollintoview/jquery.scrollintoview.js",
 		//"js/bower_components/angular/dist/angular.js",
 		"js/lhstoc/lhstoc.js",
         "src/inject/inject.js"

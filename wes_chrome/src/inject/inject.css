@@ -11,6 +11,9 @@
 #lhstoc.sidebar.left {
     width: 161px;
 	height: 100% ;
+	top: 0;
+	left: 0;
+	bottom: 0;
     /*background: #A7D7F9;
     background: #FFFFFF;*/
 }
@@ -44,7 +47,7 @@
 }
 #lhstoc{
 	overflow: auto;
-	overflow-x: hidden;
+	overflow-x: none;
 	display: block;
 }
 
@@ -61,6 +64,3 @@
 	z-index: 10;
 }
 
-input {
-	outline:none;
-}
