@@ -1,6 +1,5 @@
-//'use strict';
-console.log("lhstoc.js");
-var production = false;
+'use strict';
+var production = true;
 
 var util = 
 {
@@ -113,22 +112,6 @@ var lhstoc=
 		$("#lhstoc #toctitle").remove();
 		$("#lhstoc ul").css("display", ""); //restore #lhstoc just in case it's hidden
 
-        //$("#lhstoc").addClass("ui-resizable");
-        $("#lhstoc").addClass("ui-resizable-e");
-
-        $('#toc').resizable({
-			handles: "e",
-        });
-		var that = this;
-        $('#lhstoc').resizable({
-			handles: "e",
-          stop: function(e, ui){
-              var lhstoc_width = parseInt($("#lhstoc").css("width"));
-              console.log("lhstoc resized to: " + lhstoc_width);
-			  chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
-			  that.event_update_content_margin();
-            },
-        });
 
         $("#lhstoc").addClass("sidebar");
         $("#lhstoc").addClass("left");
@@ -162,7 +145,6 @@ var lhstoc=
 
     init_lhstoc_margin:function(margin)
 	{
-		util.debug("margin:" + margin);
 		$("#lhstoc").css("width", margin);
 	},
 
@@ -215,18 +197,15 @@ var lhstoc=
 
 	lhstoc_toggle:function(o) 
 	{
-		util.debug("lhstoc_toggle()");
 		$("#lhstoc").trigger("sidebar:toggle");
 		var that = this;
 		chrome.storage.sync.get("lhstoc_on_lhs", function(item){
 			if (item["lhstoc_on_lhs"] === true)
 			{
-				util.debug("lhstoc on lhs");
 				lhstoc.lhstoc_hide();
 			}
 			else
 			{
-				util.debug("lhstoc NOT on lhs");
 				lhstoc.lhstoc_show();
 			}
 		});
@@ -271,11 +250,10 @@ var lhstoc=
 			util.debug("margin" + lhstoc_margin);
 			if (lhstoc_enabled === true)
 			{
+				that.event_update_content_margin();
 				$( document ).ready(function() {
-
 					that.init_lhstoc();
 					that.init_lhstoc_button();
-					that.event_update_content_margin();
 					if (that.is_valid_wiki_page() === true)
 					{
 						util.debug("is_valid_wiki_page()");
@@ -290,6 +268,17 @@ var lhstoc=
 						{
 							that.lhstoc_hide();
 						}
+
+						//resizeable
+						$('#lhstoc').resizable({
+							handles: "e",
+							stop: function(e, ui){
+								var lhstoc_width = parseInt($("#lhstoc").css("width"));
+								chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
+								that.event_update_content_margin();
+							},
+							helper: "resizable-helper"
+						});
 					}
 				});
 			}
@@ -309,7 +298,7 @@ var lhstoc=
 			$("#left-navigation").css('margin-left', lhstoc_width);
 			$("#content").css('margin-left', lhstoc_width);
 			$("#footer").css('margin-left', lhstoc_width);
-			btn_toggle_width = parseInt($("#btn_toggle").css("width"));
+			var btn_toggle_width = parseInt($("#btn_toggle").css("width"));
 			$("#btn_div").css("left", lhstoc_width-btn_toggle_width-10);
 			//$("#btn_div").css("position", "relative");
 
@@ -360,8 +349,7 @@ var lhstoc=
 				anchor_links[index].lastChild.appendChild(new_element);
 
 				//anchor_links[index].focus(); //try to hover/focus this element
-				util.debug(section_tmp);
-				jquery_selector = "#lhstoc a[href='#" + section_tmp + "']";
+				var jquery_selector = "#lhstoc a[href='#" + section_tmp + "']";
 				$(jquery_selector).scrollintoview({ duration: 8 });
 			} else 
 			{
@@ -402,4 +390,3 @@ var lhstoc=
         }
     },
 };
-console.log("lhstoc.js");

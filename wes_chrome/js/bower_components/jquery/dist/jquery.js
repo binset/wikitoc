@@ -12,7 +12,6 @@
  * Date: 2016-04-05T19:26Z
  */
 
-console.log("hhhh");
 (function( global, factory ) {
 
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
