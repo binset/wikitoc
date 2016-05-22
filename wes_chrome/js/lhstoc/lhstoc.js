@@ -88,8 +88,7 @@ var lhstoc=
     is_valid_wiki_page:function() 
     {
         var is_valid = false;
-        if ($("#toc").length === 0 ||  
-            $("#left-navigation").length === 0 || 
+        if ( $("#left-navigation").length === 0 || 
             $("#content").length === 0 || 
             $("#toctitle").length === 0 ||
             $("#footer").length === 0)
@@ -124,7 +123,9 @@ var lhstoc=
         $('#lhstoc').resizable({
 			handles: "e",
           stop: function(e, ui){
-              console.log("lhstoc resized");
+              var lhstoc_width = parseInt($("#lhstoc").css("width"));
+              console.log("lhstoc resized to: " + lhstoc_width);
+			  chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
 			  that.event_update_content_margin();
             },
         });
@@ -155,7 +156,6 @@ var lhstoc=
 		$("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
 		$("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
 		$("#btn_toggle>span").css("transform", "scale(1.5)"); 
-
 
 		$("#btn_toggle").on("click", this.lhstoc_toggle);
     },
@@ -222,12 +222,12 @@ var lhstoc=
 			if (item["lhstoc_on_lhs"] === true)
 			{
 				util.debug("lhstoc on lhs");
-				that.lhstoc_hide();
+				lhstoc.lhstoc_hide();
 			}
 			else
 			{
 				util.debug("lhstoc NOT on lhs");
-				that.lhstoc_show();
+				lhstoc.lhstoc_show();
 			}
 		});
 	},
@@ -272,19 +272,24 @@ var lhstoc=
 			if (lhstoc_enabled === true)
 			{
 				$( document ).ready(function() {
+
 					that.init_lhstoc();
 					that.init_lhstoc_button();
-					that.init_lhstoc_margin(lhstoc_margin);
-					that.init_toc_chapter_listing();
-					that.init_events();
 					that.event_update_content_margin();
-					if (lhstoc_on_lhs === true)
+					if (that.is_valid_wiki_page() === true)
 					{
-						that.lhstoc_show();
-					}
-					else
-					{
-						that.lhstoc_hide();
+						util.debug("is_valid_wiki_page()");
+						that.init_lhstoc_margin(lhstoc_margin);
+						that.init_toc_chapter_listing();
+						that.init_events();
+						if (lhstoc_on_lhs === true)
+						{
+							that.lhstoc_show();
+						}
+						else
+						{
+							that.lhstoc_hide();
+						}
 					}
 				});
 			}
@@ -297,19 +302,18 @@ var lhstoc=
         
         util.debug("|||||||event_update_content_margin()");
 		chrome.storage.sync.get(null, function(item){
-			if (item["lhstoc_on_lhs"] === true)
-			{
-				var lhstoc_width = parseInt($("#lhstoc").css('width'));
-				lhstoc_width += 15; //magic css number
-				$("#left-navigation").css('margin-left', lhstoc_width);
-				$("#content").css('margin-left', lhstoc_width);
-				$("#footer").css('margin-left', lhstoc_width);
-				btn_toggle_width = parseInt($("#btn_toggle").css("width"));
-				$("#btn_div").css("left", lhstoc_width-btn_toggle_width-10);
-				//$("#btn_div").css("position", "relative");
+			var lhstoc_width = item["lhstoc_margin"];
+			lhstoc_width += 15; //magic css number
 
-				chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
-			}
+			util.debug("event_update_content_margin() margin is: " + lhstoc_width);
+			$("#left-navigation").css('margin-left', lhstoc_width);
+			$("#content").css('margin-left', lhstoc_width);
+			$("#footer").css('margin-left', lhstoc_width);
+			btn_toggle_width = parseInt($("#btn_toggle").css("width"));
+			$("#btn_div").css("left", lhstoc_width-btn_toggle_width-10);
+			//$("#btn_div").css("position", "relative");
+
+			//chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
 		});
     },
 
