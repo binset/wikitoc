@@ -229,6 +229,7 @@ var lhstoc=
 	{
 		var that = this;
 		util.inject_css("https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css");
+		util.inject_css("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css");
 
 		this.o.events = {}; //stores hash of event handlers
 		chrome.storage.sync.get( null , function (items) {
