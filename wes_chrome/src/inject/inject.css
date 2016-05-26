@@ -64,3 +64,8 @@
 	z-index: 10;
 }
 
+#lhstoc span{
+}
+#lhstoc li{
+	line-height: 1.4;
+}
