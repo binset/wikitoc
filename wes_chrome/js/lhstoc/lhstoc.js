@@ -124,23 +124,21 @@ var lhstoc=
 
     init_lhstoc_button:function()
 	{
-		//#btn_toggle
-		var btn_toggle = document.createElement('button');
-		btn_toggle.setAttribute("id", "btn_toggle");
-		var htmltext = document.createTextNode("Toggle Table of Contents");
-		btn_toggle.appendChild(htmltext);
-
 		//#btn_div
 		var btn_div = document.createElement('div');
 		btn_div.setAttribute("id", "btn_div");
-		btn_div.appendChild(btn_toggle);
 		$("#mw-navigation")[0].appendChild(btn_div);
 
-		$("#btn_toggle>span").css("-ms-transform", "scale(1.5)"); /* IE 9 */
-		$("#btn_toggle>span").css("-webkit-transform", "scale(1.5)"); /* Chrome, Safari, Opera */
-		$("#btn_toggle>span").css("transform", "scale(1.5)"); 
+		//#btn_toggle
+		var html_text = '' + 
+			'<label class="switch-light switch-holo" id=btn_label>' + 
+			'<input type="checkbox" id=btn_toggle> Wireless ' +
+			'<span> <span>Off</span> <span>On</span><a></a> </span>' +
+			'</label>';
+		$("#btn_div").append(html_text);
 
-		$("#btn_toggle").on("click", this.lhstoc_toggle);
+		var that = this;
+		$("#btn_toggle").on("click", function(){that.lhstoc_toggle()});
     },
 
     init_lhstoc_margin:function(margin)
@@ -197,31 +195,30 @@ var lhstoc=
 
 	lhstoc_toggle:function(o) 
 	{
-		$("#lhstoc").trigger("sidebar:toggle");
-		var that = this;
-		chrome.storage.sync.get("lhstoc_on_lhs", function(item){
-			if (item["lhstoc_on_lhs"] === true)
-			{
-				lhstoc.lhstoc_hide();
-			}
-			else
-			{
-				lhstoc.lhstoc_show();
-			}
-		});
+		var btn_div_left = parseInt($("#btn_div a").css("left"));
+		if (btn_div_left === 0)
+		{
+			//btn is off, now turn it on
+			this.lhstoc_show();
+		}
+		else
+		{
+			//btn is on, now turn it off
+			this.lhstoc_hide();
+		}
 	},
 
 	lhstoc_show:function()
 	{
 		chrome.storage.sync.set({"lhstoc_on_lhs": true});
-		util.debug("lhstoc_show()");
+		console.log("lhstoc_show()");
 		$("#lhstoc").trigger("sidebar:open");
 	},
 
 	lhstoc_hide:function()
 	{
 		chrome.storage.sync.set({"lhstoc_on_lhs": false});
-		util.debug("lhstoc_hide()");
+		console.log("lhstoc_hide()");
 		$("#lhstoc").trigger("sidebar:close");
 	},
 
@@ -230,6 +227,7 @@ var lhstoc=
 		var that = this;
 		util.inject_css("https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css");
 		util.inject_css("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css");
+		util.inject_css("https://cdn.jsdelivr.net/css-toggle-switch/4.0.2/toggle-switch.css");
 
 		this.o.events = {}; //stores hash of event handlers
 		chrome.storage.sync.get( null , function (items) {
@@ -263,7 +261,7 @@ var lhstoc=
 						that.init_events();
 						if (lhstoc_on_lhs === true)
 						{
-							that.lhstoc_show();
+							$("#btn_toggle").click();
 						}
 						else
 						{
