@@ -1,5 +1,5 @@
-'use strict';
-var production = true;
+//'use strict';
+var production = false;
 
 var util = 
 {
@@ -115,14 +115,14 @@ var lhstoc=
 
         $("#lhstoc").addClass("sidebar");
         $("#lhstoc").addClass("left");
-        $("#lhstoc").sidebar({side: "left"}); 
+        $("#lhstoc").sidebar({side: "left", speed: "0"}); 
 
 		//var toc_height = window.innerHeight.toString() + "px";
         //$("#lhstoc").css("height",  toc_height);
 
 	},
 
-    init_lhstoc_button:function()
+    init_lhstoc_button:function(btn_enabled)
 	{
 		//#btn_div
 		var btn_div = document.createElement('div');
@@ -132,13 +132,18 @@ var lhstoc=
 		//#btn_toggle
 		var html_text = '' + 
 			'<label class="switch-light switch-holo" id=btn_label>' + 
-			'<input type="checkbox" id=btn_toggle> Wireless ' +
+			'<input type="checkbox" id=btn_toggle> TOC' +
 			'<span> <span>Off</span> <span>On</span><a></a> </span>' +
 			'</label>';
 		$("#btn_div").append(html_text);
 
+		if (btn_enabled === true)
+		{
+			$("#btn_toggle").click();
+		}
 		var that = this;
 		$("#btn_toggle").on("click", function(){that.lhstoc_toggle()});
+		this.event_update_content_margin();
     },
 
     init_lhstoc_margin:function(margin)
@@ -231,10 +236,6 @@ var lhstoc=
 
 		this.o.events = {}; //stores hash of event handlers
 		chrome.storage.sync.get( null , function (items) {
-			for (var key in items)
-			{
-				util.debug("get " + key + ": " + items[key]);
-			}	
 			var lhstoc_enabled = true;
 			var lhstoc_on_lhs =  true;
 			var lhstoc_margin =  "270px";
@@ -246,27 +247,34 @@ var lhstoc=
 			if ("lhstoc_margin" in items)
 				lhstoc_margin =  items["lhstoc_margin"];
 
-			util.debug("margin" + lhstoc_margin);
+			//util.debug("get " + lhstoc_enabled);
+			//util.debug("get " + lhstoc_on_lhs);
+			//util.debug("get " + lhstoc_margin);
+
 			if (lhstoc_enabled === true)
 			{
-				that.event_update_content_margin();
 				$( document ).ready(function() {
-					that.init_lhstoc();
-					that.init_lhstoc_button();
 					if (that.is_valid_wiki_page() === true)
 					{
 						util.debug("is_valid_wiki_page()");
+						//that.event_update_content_margin();
+						that.init_lhstoc();
 						that.init_lhstoc_margin(lhstoc_margin);
-						that.init_toc_chapter_listing();
-						that.init_events();
+						that.init_lhstoc_button(lhstoc_on_lhs);
 						if (lhstoc_on_lhs === true)
 						{
-							$("#btn_toggle").click();
+							util.debug("if");
+							util.debug(lhstoc_on_lhs);
+							that.lhstoc_show();
 						}
 						else
 						{
+							util.debug("else");
+							util.debug(lhstoc_on_lhs);
 							that.lhstoc_hide();
 						}
+						that.init_toc_chapter_listing();
+						that.init_events();
 
 						//resizeable
 						$('#lhstoc').resizable({
@@ -277,7 +285,7 @@ var lhstoc=
 								that.event_update_content_margin();
 							},
 							helper: "resizable-helper"
-						});
+						})
 					}
 				});
 			}
@@ -297,8 +305,8 @@ var lhstoc=
 			$("#left-navigation").css('margin-left', lhstoc_width);
 			$("#content").css('margin-left', lhstoc_width);
 			$("#footer").css('margin-left', lhstoc_width);
-			var btn_toggle_width = parseInt($("#btn_toggle").css("width"));
-			$("#btn_div").css("left", lhstoc_width-btn_toggle_width-10);
+			var btn_div_width = parseInt($("#btn_div").css("width"));
+			$("#btn_div").css("left", lhstoc_width - btn_div_width - 10);
 			//$("#btn_div").css("position", "relative");
 
 			//chrome.storage.sync.set({"lhstoc_margin": lhstoc_width});
